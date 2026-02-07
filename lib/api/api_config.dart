@@ -1,5 +1,6 @@
-const String baseUrl = 'http://10.0.2.2:3000';
+import 'package:flutter/foundation.dart';
 
-String reportsEndpoint() => '$baseUrl/reports';
+const String _webBaseUrl = 'http://localhost:3000';
+const String _mobileBaseUrl = 'http://10.0.2.2:3000';
 
-String reportByIdEndpoint(String id) => '$baseUrl/reports/$id';
+String baseUrl = kIsWeb ? _webBaseUrl : _mobileBaseUrl;
