@@ -42,9 +42,7 @@ class ApiClient {
 
   Map<String, dynamic> _handleResponse(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(
-        'Request failed (${response.statusCode}): ${response.body}',
-      );
+      throw Exception(_buildErrorMessage(response));
     }
     final body = response.body.trim();
     if (body.isEmpty) {
@@ -59,9 +57,7 @@ class ApiClient {
 
   List<dynamic> _handleListResponse(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(
-        'Request failed (${response.statusCode}): ${response.body}',
-      );
+      throw Exception(_buildErrorMessage(response));
     }
     final body = response.body.trim();
     if (body.isEmpty) {
@@ -72,5 +68,29 @@ class ApiClient {
       return decoded;
     }
     throw Exception('Unexpected response format.');
+  }
+
+  String _buildErrorMessage(http.Response response) {
+    final status = response.statusCode;
+    final body = response.body.trim();
+    if (body.isEmpty) {
+      return 'Request failed ($status).';
+    }
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic>) {
+        final message = decoded['message']?.toString();
+        final details = decoded['details'];
+        if (details is List && details.isNotEmpty) {
+          return 'Request failed ($status): $message (${details.join(', ')})';
+        }
+        if (message != null && message.isNotEmpty) {
+          return 'Request failed ($status): $message';
+        }
+      }
+    } catch (_) {
+      // Fall through to raw body.
+    }
+    return 'Request failed ($status): $body';
   }
 }

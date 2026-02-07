@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -8,6 +6,7 @@ import '../models/report.dart';
 import '../repositories/reports_repository.dart';
 import '../services/location_service.dart';
 import '../services/photo_service.dart';
+import '../utils/platform_image.dart';
 import '../utils/validators.dart';
 import 'reports_list_screen.dart';
 
@@ -85,18 +84,19 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.file(
-                      File(_photoPath!),
-                      height: 180,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => SizedBox(
-                        height: 180,
-                        child: Center(
-                          child: Text(localizations.photoMissing),
+                    child:
+                        buildPlatformImage(
+                          _photoPath!,
+                          height: 180,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ) ??
+                        SizedBox(
+                          height: 180,
+                          child: Center(
+                            child: Text(localizations.photoMissing),
+                          ),
                         ),
-                      ),
-                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),

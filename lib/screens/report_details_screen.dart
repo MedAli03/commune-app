@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
 import '../models/report.dart';
+import '../utils/platform_image.dart';
 
 class ReportDetailsScreen extends StatelessWidget {
   const ReportDetailsScreen({super.key, required this.report});
@@ -45,11 +44,11 @@ class ReportDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           if (report.photoPath != null &&
-              File(report.photoPath!).existsSync())
+              platformFileExists(report.photoPath!))
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.file(
-                File(report.photoPath!),
+              child: buildPlatformImage(
+                report.photoPath!,
                 height: 200,
                 fit: BoxFit.cover,
               ),

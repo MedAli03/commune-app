@@ -37,10 +37,11 @@ The API defaults to `http://localhost:3000`.
 
 ## Flutter setup
 
-The client uses a single base URL in `lib/api/api_config.dart`.
+The client uses a single base URL in `lib/api/api_config.dart`, with automatic
+switching for web vs. Android emulator.
 
+- Flutter web: `http://localhost:3000`
 - Android emulator: `http://10.0.2.2:3000`
-- iOS simulator: `http://localhost:3000`
-- Physical device: use your machine's LAN IP, e.g. `http://192.168.1.20:3000`
-
-Update the `baseUrl` constant accordingly.
+- iOS simulator / physical device: update the constants in
+  `lib/api/api_config.dart` to use your machine's LAN IP, e.g.
+  `http://192.168.1.20:3000`.

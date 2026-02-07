@@ -10,18 +10,19 @@ class ReportsApi {
   Future<List<Report>> fetchReports() async {
     final data = await _client.getJsonList(reportsEndpoint());
     return data
-        .whereType<Map<String, dynamic>>()
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
         .map(Report.fromJson)
         .toList();
   }
 
   Future<Report> fetchReportById(String id) async {
     final data = await _client.getJson(reportByIdEndpoint(id));
-    return Report.fromJson(data);
+    return Report.fromJson(Map<String, dynamic>.from(data));
   }
 
   Future<Report> createReport(Report report) async {
     final data = await _client.postJson(reportsEndpoint(), report.toJson());
-    return Report.fromJson(data);
+    return Report.fromJson(Map<String, dynamic>.from(data));
   }
 }

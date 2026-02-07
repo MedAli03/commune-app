@@ -59,7 +59,12 @@ export const createReport = async (req, res, next) => {
       'SELECT id, title, description, photo_path, latitude, longitude, created_at FROM reports WHERE id = ? LIMIT 1',
       [id],
     );
-    res.status(201).json(rows.length ? mapRowToReport(rows[0]) : { id });
+    if (rows.length === 0) {
+      const error = new Error('Failed to load created report.');
+      error.statusCode = 500;
+      throw error;
+    }
+    res.status(201).json(mapRowToReport(rows[0]));
   } catch (error) {
     next(error);
   }
@@ -123,7 +128,12 @@ export const updateReport = async (req, res, next) => {
       'SELECT id, title, description, photo_path, latitude, longitude, created_at FROM reports WHERE id = ? LIMIT 1',
       [id],
     );
-    res.json(rows.length ? mapRowToReport(rows[0]) : { id });
+    if (rows.length === 0) {
+      const error = new Error('Failed to load updated report.');
+      error.statusCode = 500;
+      throw error;
+    }
+    res.json(mapRowToReport(rows[0]));
   } catch (error) {
     next(error);
   }

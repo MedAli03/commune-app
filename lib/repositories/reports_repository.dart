@@ -28,6 +28,9 @@ class ReportsRepository {
     await box.put(report.id, report);
     try {
       final syncedReport = await _api.createReport(report);
+      if (syncedReport.id != report.id) {
+        await box.delete(report.id);
+      }
       await box.put(syncedReport.id, syncedReport);
     } catch (error, stackTrace) {
       debugPrint('Create report sync failed: $error');
