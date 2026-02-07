@@ -27,7 +27,8 @@ class ReportsRepository {
     final box = Hive.box<Report>(reportsBoxName);
     await box.put(report.id, report);
     try {
-      await _api.createReport(report);
+      final syncedReport = await _api.createReport(report);
+      await box.put(syncedReport.id, syncedReport);
     } catch (error, stackTrace) {
       debugPrint('Create report sync failed: $error');
       debugPrintStack(stackTrace: stackTrace);

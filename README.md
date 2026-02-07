@@ -1,16 +1,46 @@
-# flutter_application
+# Commune App
 
-A new Flutter project.
+Flutter + Node/Express + MySQL app for creating and syncing municipal issue
+reports.
 
-## Getting Started
+## Repository layout
 
-This project is a starting point for a Flutter application.
+- `lib/`: Flutter client
+- `backend/`: Node/Express API
+- `backend/sql/`: MySQL schema and seed files
 
-A few resources to get you started if this is your first Flutter project:
+## Backend setup (MySQL + API)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1) Create the database + tables:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+mysql -u root < backend/sql/001_create_tables.sql
+mysql -u root < backend/sql/002_reports_contract_alignment.sql
+```
+
+Optional seed data:
+
+```bash
+mysql -u root < backend/sql/003_seed_reports.sql
+```
+
+2) Start the API server:
+
+```bash
+cd backend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+The API defaults to `http://localhost:3000`.
+
+## Flutter setup
+
+The client uses a single base URL in `lib/api/api_config.dart`.
+
+- Android emulator: `http://10.0.2.2:3000`
+- iOS simulator: `http://localhost:3000`
+- Physical device: use your machine's LAN IP, e.g. `http://192.168.1.20:3000`
+
+Update the `baseUrl` constant accordingly.

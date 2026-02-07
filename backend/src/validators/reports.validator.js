@@ -1,6 +1,9 @@
 const isNonEmptyString = (value) =>
   typeof value === 'string' && value.trim().length > 0;
 
+const isOptionalString = (value) =>
+  value === null || value === undefined || typeof value === 'string';
+
 const isOptionalNumber = (value) =>
   value === null || value === undefined || Number.isFinite(Number(value));
 
@@ -13,9 +16,13 @@ const parseOptionalNumber = (value) => {
 };
 
 const isValidDateString = (value) =>
-  value === null ||
-  value === undefined ||
-  (typeof value === 'string' && !Number.isNaN(Date.parse(value)));
+  typeof value === 'string' && !Number.isNaN(Date.parse(value));
+
+const isOptionalDateString = (value) =>
+  value === undefined || isValidDateString(value);
+
+const hasField = (body, field) =>
+  Object.prototype.hasOwnProperty.call(body ?? {}, field);
 
 export const validateCreateReport = (body) => {
   const errors = [];
@@ -29,13 +36,16 @@ export const validateCreateReport = (body) => {
   if (!isNonEmptyString(body?.description)) {
     errors.push('description is required and must be a non-empty string.');
   }
+  if (!isOptionalString(body?.photoPath)) {
+    errors.push('photoPath must be a string or null when provided.');
+  }
   if (!isOptionalNumber(body?.latitude)) {
     errors.push('latitude must be a number if provided.');
   }
   if (!isOptionalNumber(body?.longitude)) {
     errors.push('longitude must be a number if provided.');
   }
-  if (!isValidDateString(body?.createdAt)) {
+  if (!isOptionalDateString(body?.createdAt)) {
     errors.push('createdAt must be a valid ISO-8601 string if provided.');
   }
 
@@ -63,13 +73,16 @@ export const validateUpdateReport = (body) => {
   if (body?.description !== undefined && !isNonEmptyString(body?.description)) {
     errors.push('description must be a non-empty string when provided.');
   }
-  if (!isOptionalNumber(body?.latitude)) {
+  if (hasField(body, 'photoPath') && !isOptionalString(body?.photoPath)) {
+    errors.push('photoPath must be a string or null when provided.');
+  }
+  if (hasField(body, 'latitude') && !isOptionalNumber(body?.latitude)) {
     errors.push('latitude must be a number if provided.');
   }
-  if (!isOptionalNumber(body?.longitude)) {
+  if (hasField(body, 'longitude') && !isOptionalNumber(body?.longitude)) {
     errors.push('longitude must be a number if provided.');
   }
-  if (!isValidDateString(body?.createdAt)) {
+  if (hasField(body, 'createdAt') && !isValidDateString(body?.createdAt)) {
     errors.push('createdAt must be a valid ISO-8601 string if provided.');
   }
 
@@ -77,12 +90,18 @@ export const validateUpdateReport = (body) => {
     ok: errors.length === 0,
     errors,
     values: {
-      title: body?.title?.trim(),
-      description: body?.description?.trim(),
-      photoPath: body?.photoPath ?? null,
-      latitude: parseOptionalNumber(body?.latitude),
-      longitude: parseOptionalNumber(body?.longitude),
-      createdAt: body?.createdAt ?? null,
+      title: hasField(body, 'title') ? body?.title?.trim() : undefined,
+      description: hasField(body, 'description')
+        ? body?.description?.trim()
+        : undefined,
+      photoPath: hasField(body, 'photoPath') ? body?.photoPath ?? null : undefined,
+      latitude: hasField(body, 'latitude')
+        ? parseOptionalNumber(body?.latitude)
+        : undefined,
+      longitude: hasField(body, 'longitude')
+        ? parseOptionalNumber(body?.longitude)
+        : undefined,
+      createdAt: hasField(body, 'createdAt') ? body?.createdAt : undefined,
     },
   };
 };

@@ -1,16 +1,9 @@
 import pool from '../db/pool.js';
-
-const mapRowToReport = (row) => ({
-  id: row.id,
-  title: row.title,
-  description: row.description,
-  photoPath: row.photo_path ?? null,
-  latitude: row.latitude !== null ? Number(row.latitude) : null,
-  longitude: row.longitude !== null ? Number(row.longitude) : null,
-  createdAt: row.created_at instanceof Date
-    ? row.created_at.toISOString()
-    : new Date(row.created_at).toISOString(),
-});
+import {
+  buildCreateReportInsert,
+  mapRowToReport,
+  toDbUpdateValue,
+} from '../mappers/report.mapper.js';
 
 export const getReports = async (req, res, next) => {
   try {
@@ -31,7 +24,7 @@ export const getReportById = async (req, res, next) => {
       [id],
     );
     if (rows.length === 0) {
-      return res.status(404).json({ error: 'Report not found' });
+      return res.status(404).json({ message: 'Report not found.' });
     }
     res.json(mapRowToReport(rows[0]));
   } catch (error) {
@@ -51,27 +44,16 @@ export const createReport = async (req, res, next) => {
       createdAt,
     } = req.validated;
 
-    if (createdAt) {
-      await pool.execute(
-        `INSERT INTO reports (id, title, description, photo_path, latitude, longitude, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          id,
-          title,
-          description,
-          photoPath,
-          latitude,
-          longitude,
-          new Date(createdAt),
-        ],
-      );
-    } else {
-      await pool.execute(
-        `INSERT INTO reports (id, title, description, photo_path, latitude, longitude)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [id, title, description, photoPath, latitude, longitude],
-      );
-    }
+    const { sql, values } = buildCreateReportInsert({
+      id,
+      title,
+      description,
+      photoPath,
+      latitude,
+      longitude,
+      createdAt,
+    });
+    await pool.execute(sql, values);
 
     const [rows] = await pool.execute(
       'SELECT id, title, description, photo_path, latitude, longitude, created_at FROM reports WHERE id = ? LIMIT 1',
@@ -120,11 +102,11 @@ export const updateReport = async (req, res, next) => {
     }
     if (createdAt !== undefined) {
       fields.push('created_at = ?');
-      values.push(createdAt ? new Date(createdAt) : null);
+      values.push(toDbUpdateValue(createdAt));
     }
 
     if (fields.length === 0) {
-      return res.status(400).json({ error: 'No fields to update.' });
+      return res.status(400).json({ message: 'No fields to update.' });
     }
 
     values.push(id);
@@ -134,7 +116,7 @@ export const updateReport = async (req, res, next) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Report not found' });
+      return res.status(404).json({ message: 'Report not found.' });
     }
 
     const [rows] = await pool.execute(
@@ -155,7 +137,7 @@ export const deleteReport = async (req, res, next) => {
       [id],
     );
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Report not found' });
+      return res.status(404).json({ message: 'Report not found.' });
     }
     res.status(204).send();
   } catch (error) {

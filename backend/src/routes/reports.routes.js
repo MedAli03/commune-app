@@ -30,7 +30,10 @@ router.get('/reports/:id', getReportById);
 router.post('/reports', (req, res, next) => {
   const result = validateCreateReport(req.body);
   if (!result.ok) {
-    return res.status(400).json({ error: result.errors.join(' ') });
+    return res.status(400).json({
+      message: 'Validation failed.',
+      details: result.errors,
+    });
   }
   req.validated = result.values;
   return createReport(req, res, next);
@@ -39,7 +42,10 @@ router.post('/reports', (req, res, next) => {
 router.put('/reports/:id', (req, res, next) => {
   const result = validateUpdateReport(req.body);
   if (!result.ok) {
-    return res.status(400).json({ error: result.errors.join(' ') });
+    return res.status(400).json({
+      message: 'Validation failed.',
+      details: result.errors,
+    });
   }
   req.validated = result.values;
   return updateReport(req, res, next);

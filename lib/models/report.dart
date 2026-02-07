@@ -43,7 +43,7 @@ class Report extends HiveObject {
       'photoPath': photoPath,
       'latitude': latitude,
       'longitude': longitude,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt.toUtc().toIso8601String(),
     };
   }
 

@@ -20,7 +20,8 @@ class ReportsApi {
     return Report.fromJson(data);
   }
 
-  Future<void> createReport(Report report) async {
-    await _client.postJson(reportsEndpoint(), report.toJson());
+  Future<Report> createReport(Report report) async {
+    final data = await _client.postJson(reportsEndpoint(), report.toJson());
+    return Report.fromJson(data);
   }
 }

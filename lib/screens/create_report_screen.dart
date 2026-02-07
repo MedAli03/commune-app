@@ -276,7 +276,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
         photoPath: _photoPath,
         latitude: _latitude,
         longitude: _longitude,
-        createdAt: DateTime.now(),
+        createdAt: DateTime.now().toUtc(),
       );
 
       await _reportsRepository.createReportAndSync(report);
