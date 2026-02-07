@@ -1,14 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../localization/app_localizations.dart';
 import '../models/report.dart';
+import '../repositories/reports_repository.dart';
 import '../services/location_service.dart';
 import '../services/photo_service.dart';
-import '../storage/hive_boxes.dart';
 import '../utils/validators.dart';
 import 'reports_list_screen.dart';
 
@@ -25,6 +24,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
   final _descriptionController = TextEditingController();
   final _locationService = LocationService();
   final _photoService = PhotoService();
+  final _reportsRepository = ReportsRepository();
   final _uuid = const Uuid();
 
   String? _photoPath;
@@ -279,8 +279,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
         createdAt: DateTime.now(),
       );
 
-      final box = Hive.box<Report>(reportsBoxName);
-      await box.put(report.id, report);
+      await _reportsRepository.createReportAndSync(report);
 
       if (!mounted) {
         return;

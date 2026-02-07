@@ -3,11 +3,25 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../localization/app_localizations.dart';
 import '../models/report.dart';
+import '../repositories/reports_repository.dart';
 import '../storage/hive_boxes.dart';
 import 'report_details_screen.dart';
 
-class ReportsListScreen extends StatelessWidget {
+class ReportsListScreen extends StatefulWidget {
   const ReportsListScreen({super.key});
+
+  @override
+  State<ReportsListScreen> createState() => _ReportsListScreenState();
+}
+
+class _ReportsListScreenState extends State<ReportsListScreen> {
+  final _reportsRepository = ReportsRepository();
+
+  @override
+  void initState() {
+    super.initState();
+    _reportsRepository.syncFromServer();
+  }
 
   @override
   Widget build(BuildContext context) {

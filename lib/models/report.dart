@@ -34,4 +34,28 @@ class Report extends HiveObject {
 
   @HiveField(6)
   final DateTime createdAt;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'photoPath': photoPath,
+      'latitude': latitude,
+      'longitude': longitude,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  factory Report.fromJson(Map<String, dynamic> json) {
+    return Report(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      photoPath: json['photoPath'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+  }
 }
