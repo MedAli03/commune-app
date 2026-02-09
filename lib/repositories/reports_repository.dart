@@ -23,6 +23,14 @@ class ReportsRepository {
     }
   }
 
+  Future<List<Report>> fetchReportsFromServer() async {
+    return _api.fetchReports();
+  }
+
+  Future<void> deleteReportOnServer(String id) async {
+    await _api.deleteReport(id);
+  }
+
   Future<void> createReportAndSync(Report report) async {
     final box = Hive.box<Report>(reportsBoxName);
     await box.put(report.id, report);

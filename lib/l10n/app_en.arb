@@ -37,11 +37,15 @@
   "admin_login_button": "Login",
   "admin_login_error": "Incorrect PIN. Try again.",
   "admin_reports_title": "Admin reports",
+  "admin_reports_load_failed": "Unable to load reports. Check your connection.",
   "selected_count_label": "Selected: {count}",
   "delete_selected": "Delete selected",
   "delete_all": "Delete all",
   "delete": "Delete",
+  "delete_success": "Report deleted.",
+  "delete_failed": "Unable to delete report.",
   "select_all": "Select all",
+  "refresh": "Refresh",
   "confirm_delete_selected_title": "Delete selected reports?",
   "confirm_delete_all_title": "Delete ALL reports? This cannot be undone."
 }

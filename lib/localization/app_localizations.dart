@@ -69,10 +69,14 @@ class AppLocalizations {
   String get adminLoginButton => _lookup('admin_login_button');
   String get adminLoginError => _lookup('admin_login_error');
   String get adminReportsTitle => _lookup('admin_reports_title');
+  String get adminReportsLoadFailed => _lookup('admin_reports_load_failed');
   String get deleteSelected => _lookup('delete_selected');
   String get deleteAll => _lookup('delete_all');
   String get deleteAction => _lookup('delete');
+  String get deleteSuccess => _lookup('delete_success');
+  String get deleteFailed => _lookup('delete_failed');
   String get selectAll => _lookup('select_all');
+  String get refresh => _lookup('refresh');
   String get confirmDeleteSelectedTitle =>
       _lookup('confirm_delete_selected_title');
   String get confirmDeleteAllTitle => _lookup('confirm_delete_all_title');

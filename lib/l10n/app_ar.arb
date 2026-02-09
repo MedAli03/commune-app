@@ -37,11 +37,15 @@
   "admin_login_button": "تسجيل الدخول",
   "admin_login_error": "رمز غير صحيح. حاول مرة أخرى.",
   "admin_reports_title": "بلاغات المشرف",
+  "admin_reports_load_failed": "تعذر تحميل البلاغات. تحقق من الاتصال.",
   "selected_count_label": "المحدد: {count}",
   "delete_selected": "حذف المحدد",
   "delete_all": "حذف الكل",
   "delete": "حذف",
+  "delete_success": "تم حذف البلاغ.",
+  "delete_failed": "تعذر حذف البلاغ.",
   "select_all": "تحديد الكل",
+  "refresh": "تحديث",
   "confirm_delete_selected_title": "هل تريد حذف البلاغات المحددة؟",
   "confirm_delete_all_title": "هل تريد حذف جميع البلاغات؟ لا يمكن التراجع."
 }

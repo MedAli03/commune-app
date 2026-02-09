@@ -10,10 +10,12 @@ class ReportDetailsScreen extends StatelessWidget {
     super.key,
     required this.report,
     this.canDelete = false,
+    this.onDeleted,
   });
 
   final Report report;
   final bool canDelete;
+  final VoidCallback? onDeleted;
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +109,23 @@ class ReportDetailsScreen extends StatelessWidget {
       return;
     }
 
-    await ReportsRepository().deleteReport(report.id);
-    if (context.mounted) {
-      Navigator.of(context).pop();
+    try {
+      await ReportsRepository().deleteReportOnServer(report.id);
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(localizations.deleteSuccess)),
+      );
+      onDeleted?.call();
+      Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${localizations.deleteFailed} $error')),
+      );
     }
   }
 }

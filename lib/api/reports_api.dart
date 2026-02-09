@@ -25,4 +25,8 @@ class ReportsApi {
     final data = await _client.postJson(reportsEndpoint(), report.toJson());
     return Report.fromJson(Map<String, dynamic>.from(data));
   }
+
+  Future<void> deleteReport(String id) async {
+    await _client.delete(deleteReportEndpoint(id));
+  }
 }

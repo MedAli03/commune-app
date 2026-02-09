@@ -35,6 +35,14 @@ class ApiClient {
     return _handleResponse(response);
   }
 
+  Future<void> delete(String url) async {
+    final response = await _client.delete(
+      Uri.parse(url),
+      headers: _jsonHeaders(),
+    );
+    _handleEmptyResponse(response);
+  }
+
   Map<String, String> _jsonHeaders() => const {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -68,6 +76,12 @@ class ApiClient {
       return decoded;
     }
     throw Exception('Unexpected response format.');
+  }
+
+  void _handleEmptyResponse(http.Response response) {
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(_buildErrorMessage(response));
+    }
   }
 
   String _buildErrorMessage(http.Response response) {
