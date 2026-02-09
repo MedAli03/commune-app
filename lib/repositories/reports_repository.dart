@@ -23,6 +23,14 @@ class ReportsRepository {
     }
   }
 
+  Future<List<Report>> fetchReportsFromServer() async {
+    return _api.fetchReports();
+  }
+
+  Future<void> deleteReportOnServer(String id) async {
+    await _api.deleteReport(id);
+  }
+
   Future<void> createReportAndSync(Report report) async {
     final box = Hive.box<Report>(reportsBoxName);
     await box.put(report.id, report);
@@ -36,5 +44,20 @@ class ReportsRepository {
       debugPrint('Create report sync failed: $error');
       debugPrintStack(stackTrace: stackTrace);
     }
+  }
+
+  Future<void> deleteReport(String id) async {
+    final box = Hive.box<Report>(reportsBoxName);
+    await box.delete(id);
+  }
+
+  Future<void> deleteReports(List<String> ids) async {
+    final box = Hive.box<Report>(reportsBoxName);
+    await box.deleteAll(ids);
+  }
+
+  Future<void> deleteAllReports() async {
+    final box = Hive.box<Report>(reportsBoxName);
+    await box.clear();
   }
 }

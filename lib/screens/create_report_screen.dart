@@ -11,7 +11,9 @@ import '../utils/validators.dart';
 import 'reports_list_screen.dart';
 
 class CreateReportScreen extends StatefulWidget {
-  const CreateReportScreen({super.key});
+  const CreateReportScreen({super.key, this.onSaved});
+
+  final VoidCallback? onSaved;
 
   @override
   State<CreateReportScreen> createState() => _CreateReportScreenState();
@@ -289,6 +291,11 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(localizations.reportSaved)),
       );
+
+      if (widget.onSaved != null) {
+        widget.onSaved!();
+        return;
+      }
 
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute(

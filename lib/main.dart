@@ -10,5 +10,6 @@ Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(ReportAdapter());
   await Hive.openBox<Report>(reportsBoxName);
+  await Hive.openBox(authBoxName);
   runApp(const App());
 }

@@ -62,6 +62,28 @@ class AppLocalizations {
   String get photoStatusMissing => _lookup('photo_status_missing');
   String get locationStatusPresent => _lookup('location_status_present');
   String get locationStatusMissing => _lookup('location_status_missing');
+  String get adminLoginEntry => _lookup('admin_login_entry');
+  String get adminLoginTitle => _lookup('admin_login_title');
+  String get adminLoginPrompt => _lookup('admin_login_prompt');
+  String get adminPinLabel => _lookup('admin_pin_label');
+  String get adminLoginButton => _lookup('admin_login_button');
+  String get adminLoginError => _lookup('admin_login_error');
+  String get adminReportsTitle => _lookup('admin_reports_title');
+  String get adminReportsLoadFailed => _lookup('admin_reports_load_failed');
+  String get deleteSelected => _lookup('delete_selected');
+  String get deleteAll => _lookup('delete_all');
+  String get deleteAction => _lookup('delete');
+  String get deleteSuccess => _lookup('delete_success');
+  String get deleteFailed => _lookup('delete_failed');
+  String get selectAll => _lookup('select_all');
+  String get refresh => _lookup('refresh');
+  String get confirmDeleteSelectedTitle =>
+      _lookup('confirm_delete_selected_title');
+  String get confirmDeleteAllTitle => _lookup('confirm_delete_all_title');
+
+  String selectedCountLabel(int count) {
+    return _lookup('selected_count_label').replaceAll('{count}', '$count');
+  }
 
   String locationCaptured({required String lat, required String lng}) {
     return _lookup('location_captured')

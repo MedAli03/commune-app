@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
 import '../models/report.dart';
+import '../repositories/reports_repository.dart';
 import '../utils/platform_image.dart';
 
 class ReportDetailsScreen extends StatelessWidget {
-  const ReportDetailsScreen({super.key, required this.report});
+  const ReportDetailsScreen({
+    super.key,
+    required this.report,
+    this.canDelete = false,
+    this.onDeleted,
+  });
 
   final Report report;
+  final bool canDelete;
+  final VoidCallback? onDeleted;
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +23,14 @@ class ReportDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.detailsTitle),
+        actions: [
+          if (canDelete)
+            IconButton(
+              tooltip: localizations.deleteAction,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () => _confirmDelete(context),
+            ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -67,6 +83,50 @@ class ReportDetailsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final localizations = AppLocalizations.of(context);
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(localizations.deleteAction),
+        content: Text(localizations.confirmDeleteSelectedTitle),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(localizations.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(localizations.deleteAction),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) {
+      return;
+    }
+
+    try {
+      await ReportsRepository().deleteReportOnServer(report.id);
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(localizations.deleteSuccess)),
+      );
+      onDeleted?.call();
+      Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${localizations.deleteFailed} $error')),
+      );
+    }
   }
 }
 

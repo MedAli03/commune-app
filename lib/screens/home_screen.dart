@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
+import 'admin_login_screen.dart';
 import 'create_report_screen.dart';
 import 'reports_list_screen.dart';
 
@@ -73,6 +74,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
               child: Text(localizations.myReports),
+            ),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AdminLoginScreen(),
+                  ),
+                );
+              },
+              child: Text(localizations.adminLoginEntry),
             ),
           ],
         ),
