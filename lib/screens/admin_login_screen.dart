@@ -58,7 +58,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       width: 18,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(localizations.adminLoginAction),
+                  : Text(localizations.adminLoginButton),
             ),
           ],
         ),

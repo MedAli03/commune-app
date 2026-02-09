@@ -34,6 +34,14 @@
   "admin_login_title": "تسجيل دخول المشرف",
   "admin_login_prompt": "أدخل رمز المشرف للمتابعة.",
   "admin_pin_label": "رمز المشرف",
-  "admin_login_action": "تسجيل الدخول",
-  "admin_login_error": "رمز غير صحيح. حاول مرة أخرى."
+  "admin_login_button": "تسجيل الدخول",
+  "admin_login_error": "رمز غير صحيح. حاول مرة أخرى.",
+  "admin_reports_title": "بلاغات المشرف",
+  "selected_count_label": "المحدد: {count}",
+  "delete_selected": "حذف المحدد",
+  "delete_all": "حذف الكل",
+  "delete": "حذف",
+  "select_all": "تحديد الكل",
+  "confirm_delete_selected_title": "هل تريد حذف البلاغات المحددة؟",
+  "confirm_delete_all_title": "هل تريد حذف جميع البلاغات؟ لا يمكن التراجع."
 }

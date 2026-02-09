@@ -34,6 +34,14 @@
   "admin_login_title": "Admin login",
   "admin_login_prompt": "Enter the admin PIN to continue.",
   "admin_pin_label": "Admin PIN",
-  "admin_login_action": "Login",
-  "admin_login_error": "Incorrect PIN. Try again."
+  "admin_login_button": "Login",
+  "admin_login_error": "Incorrect PIN. Try again.",
+  "admin_reports_title": "Admin reports",
+  "selected_count_label": "Selected: {count}",
+  "delete_selected": "Delete selected",
+  "delete_all": "Delete all",
+  "delete": "Delete",
+  "select_all": "Select all",
+  "confirm_delete_selected_title": "Delete selected reports?",
+  "confirm_delete_all_title": "Delete ALL reports? This cannot be undone."
 }

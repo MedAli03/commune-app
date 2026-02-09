@@ -37,4 +37,19 @@ class ReportsRepository {
       debugPrintStack(stackTrace: stackTrace);
     }
   }
+
+  Future<void> deleteReport(String id) async {
+    final box = Hive.box<Report>(reportsBoxName);
+    await box.delete(id);
+  }
+
+  Future<void> deleteReports(List<String> ids) async {
+    final box = Hive.box<Report>(reportsBoxName);
+    await box.deleteAll(ids);
+  }
+
+  Future<void> deleteAllReports() async {
+    final box = Hive.box<Report>(reportsBoxName);
+    await box.clear();
+  }
 }

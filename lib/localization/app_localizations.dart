@@ -66,8 +66,20 @@ class AppLocalizations {
   String get adminLoginTitle => _lookup('admin_login_title');
   String get adminLoginPrompt => _lookup('admin_login_prompt');
   String get adminPinLabel => _lookup('admin_pin_label');
-  String get adminLoginAction => _lookup('admin_login_action');
+  String get adminLoginButton => _lookup('admin_login_button');
   String get adminLoginError => _lookup('admin_login_error');
+  String get adminReportsTitle => _lookup('admin_reports_title');
+  String get deleteSelected => _lookup('delete_selected');
+  String get deleteAll => _lookup('delete_all');
+  String get deleteAction => _lookup('delete');
+  String get selectAll => _lookup('select_all');
+  String get confirmDeleteSelectedTitle =>
+      _lookup('confirm_delete_selected_title');
+  String get confirmDeleteAllTitle => _lookup('confirm_delete_all_title');
+
+  String selectedCountLabel(int count) {
+    return _lookup('selected_count_label').replaceAll('{count}', '$count');
+  }
 
   String locationCaptured({required String lat, required String lng}) {
     return _lookup('location_captured')
