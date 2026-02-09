@@ -62,6 +62,12 @@ class AppLocalizations {
   String get photoStatusMissing => _lookup('photo_status_missing');
   String get locationStatusPresent => _lookup('location_status_present');
   String get locationStatusMissing => _lookup('location_status_missing');
+  String get adminLoginEntry => _lookup('admin_login_entry');
+  String get adminLoginTitle => _lookup('admin_login_title');
+  String get adminLoginPrompt => _lookup('admin_login_prompt');
+  String get adminPinLabel => _lookup('admin_pin_label');
+  String get adminLoginAction => _lookup('admin_login_action');
+  String get adminLoginError => _lookup('admin_login_error');
 
   String locationCaptured({required String lat, required String lng}) {
     return _lookup('location_captured')

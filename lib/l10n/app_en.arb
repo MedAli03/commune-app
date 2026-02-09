@@ -29,5 +29,11 @@
   "photo_status_present": "Photo ✓",
   "photo_status_missing": "No photo",
   "location_status_present": "Location ✓",
-  "location_status_missing": "No location"
+  "location_status_missing": "No location",
+  "admin_login_entry": "Admin login",
+  "admin_login_title": "Admin login",
+  "admin_login_prompt": "Enter the admin PIN to continue.",
+  "admin_pin_label": "Admin PIN",
+  "admin_login_action": "Login",
+  "admin_login_error": "Incorrect PIN. Try again."
 }
