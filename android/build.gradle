@@ -1,0 +1,25 @@
+ext {
+    flutter = [
+        compileSdkVersion: 34,
+        minSdkVersion: 21,
+        targetSdkVersion: 34,
+    ]
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.ext.flutter = rootProject.ext.flutter
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
