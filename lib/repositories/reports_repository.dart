@@ -29,6 +29,10 @@ class ReportsRepository {
     );
   }
 
+  Future<Report> fetchReportById(String id) async {
+    return _api.fetchReportById(id);
+  }
+
   Future<void> syncFromServer() async {
     try {
       final reports = await _api.fetchReports();
@@ -58,19 +62,51 @@ class ReportsRepository {
   }
 
   Future<void> deleteReportAndSync(String reportId) async {
+    try {
+      await deleteReportById(reportId);
+    } catch (error, stackTrace) {
+      debugPrint('Delete report sync failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> deleteReportById(String reportId) async {
     final box = Hive.box<Report>(reportsBoxName);
     final localReport = box.get(reportId);
     await box.delete(reportId);
 
     try {
       await _api.deleteReport(reportId);
-    } catch (error, stackTrace) {
+    } catch (error) {
       if (localReport != null) {
         await box.put(localReport.id, localReport);
       }
-      debugPrint('Delete report sync failed: $error');
-      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
     }
+  }
+
+  Future<Map<String, dynamic>> uploadReportImage({
+    required String reportId,
+    required XFile image,
+    void Function(double progress)? onProgress,
+  }) async {
+    return _api.uploadReportImage(
+      reportId,
+      image,
+      onSendProgress: (sent, total) {
+        if (onProgress == null || total <= 0) {
+          return;
+        }
+        onProgress(sent / total);
+      },
+    );
+  }
+
+  Future<void> deleteReportImage({
+    required String reportId,
+    required String imageId,
+  }) async {
+    await _api.deleteReportImage(reportId, imageId);
   }
 
   Future<void> runApiSmokeTest({String? sampleImagePath}) async {

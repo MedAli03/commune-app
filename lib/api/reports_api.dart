@@ -54,13 +54,15 @@ class ReportsApi {
 
   Future<Map<String, dynamic>> uploadReportImage(
     String reportId,
-    XFile image,
-  ) async {
+    XFile image, {
+    void Function(int, int)? onSendProgress,
+  }) async {
     try {
       return await _uploadReportImageWithField(
         reportId: reportId,
         image: image,
         fieldName: 'image',
+        onSendProgress: onSendProgress,
       );
     } on AppException catch (error) {
       final shouldFallback = error.statusCode == 400 ||
@@ -74,6 +76,7 @@ class ReportsApi {
         reportId: reportId,
         image: image,
         fieldName: 'file',
+        onSendProgress: onSendProgress,
       );
     }
   }
@@ -86,6 +89,7 @@ class ReportsApi {
     required String reportId,
     required XFile image,
     required String fieldName,
+    void Function(int, int)? onSendProgress,
   }) async {
     final fileName = image.name.isNotEmpty ? image.name : 'upload.jpg';
     final multipart = await MultipartFile.fromFile(
@@ -99,6 +103,7 @@ class ReportsApi {
     return _client.postMultipart(
       reportImagesEndpoint(reportId),
       formData,
+      onSendProgress: onSendProgress,
     );
   }
 }

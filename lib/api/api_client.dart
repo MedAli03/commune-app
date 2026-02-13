@@ -88,12 +88,14 @@ class ApiClient {
 
   Future<Map<String, dynamic>> postMultipart(
     String url,
-    FormData formData,
-  ) async {
+    FormData formData, {
+    void Function(int, int)? onSendProgress,
+  }) async {
     try {
       final response = await _dio.post<dynamic>(
         url,
         data: formData,
+        onSendProgress: onSendProgress,
         options: Options(
           headers: const {
             'Content-Type': 'multipart/form-data',
