@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../api/app_exception.dart';
 import '../localization/app_localizations.dart';
 import '../models/report.dart';
 import '../repositories/reports_repository.dart';
@@ -74,7 +75,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         return;
       }
       setState(() {
-        _errorMessage = error.toString();
+        _errorMessage = _readableError(error);
       });
     } finally {
       if (mounted) {
@@ -115,7 +116,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         return;
       }
       setState(() {
-        _errorMessage = error.toString();
+        _errorMessage = _readableError(error);
       });
     } finally {
       if (mounted) {
@@ -181,6 +182,22 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       case ReportStatusFilter.resolved:
         return 'Resolved';
     }
+  }
+
+  String _readableError(Object error) {
+    if (error is AppException) {
+      final details = error.details;
+      if (details == null || details.isEmpty) {
+        return error.message;
+      }
+      if (details['errors'] is List) {
+        final values =
+            (details['errors'] as List).map((e) => e.toString()).join(', ');
+        return '${error.message}: $values';
+      }
+      return '${error.message}: $details';
+    }
+    return error.toString();
   }
 
   @override
@@ -254,8 +271,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                       ? localizations.noReports
                       : 'Unable to load reports',
                   message: _errorMessage ?? localizations.noReportsHint,
-                  actionLabel: 'Retry',
-                  onAction: _loadInitial,
+                  actionLabel: _errorMessage == null ? null : 'Retry',
+                  onAction: _errorMessage == null ? null : _loadInitial,
                 ),
               )
             else

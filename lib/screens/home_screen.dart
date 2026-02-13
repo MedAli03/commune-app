@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
+import '../theme/app_theme.dart';
+import '../widgets/section_card.dart';
 import 'create_report_screen.dart';
 import 'reports_list_screen.dart';
 
@@ -25,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final isArabic = widget.locale.languageCode == 'ar';
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(localizations.appTitle),
         actions: [
           TextButton(
@@ -39,40 +40,70 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              localizations.appTitle,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              localizations.noReportsHint,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateReportScreen(),
+            SectionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    localizations.appTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
-                );
-              },
-              child: Text(localizations.newReport),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const ReportsListScreen(),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    localizations.noReportsHint,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                );
-              },
-              child: Text(localizations.myReports),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const CreateReportScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.edit_note_outlined),
+                label: Text(localizations.newReport),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const ReportsListScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.dashboard_outlined),
+                label: Text(localizations.myReports),
+              ),
+            ),
+            const Spacer(),
+            Text(
+              'Anonymous reporting enabled',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Admin tools are available in the reports dashboard.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Language: ${isArabic ? 'Arabic' : 'English'}',
+              style: Theme.of(context).textTheme.labelSmall,
             ),
           ],
         ),
