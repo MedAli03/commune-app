@@ -108,6 +108,28 @@ class ApiClient {
     }
   }
 
+  Future<Map<String, dynamic>> patchJson(
+    String url,
+    Map<String, dynamic> body,
+  ) async {
+    try {
+      final response = await _dio.patch<dynamic>(
+        url,
+        data: body,
+        options: Options(
+          headers: const {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      return _decodeObjectBody(response.data);
+    } on DioException catch (error) {
+      throw _normalizeDioError(error);
+    } catch (_) {
+      throw AppException(message: 'Unexpected network error.');
+    }
+  }
+
   Future<Map<String, dynamic>> postMultipart(
     String url,
     FormData formData, {

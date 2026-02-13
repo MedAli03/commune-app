@@ -8,6 +8,7 @@ class Report extends HiveObject {
     required this.id,
     required this.title,
     required this.description,
+    this.status,
     this.photoPath,
     this.latitude,
     this.longitude,
@@ -35,11 +36,15 @@ class Report extends HiveObject {
   @HiveField(6)
   final DateTime createdAt;
 
+  @HiveField(7)
+  final String? status;
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'description': description,
+      if (status != null) 'status': status,
       'photoPath': photoPath,
       'latitude': latitude,
       'longitude': longitude,
@@ -63,6 +68,7 @@ class Report extends HiveObject {
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
+      status: json['status']?.toString(),
       photoPath: (json['photoPath'] ?? json['photo_path'])?.toString(),
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),

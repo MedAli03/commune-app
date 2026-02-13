@@ -24,13 +24,14 @@ class ReportAdapter extends TypeAdapter<Report> {
       latitude: fields[4] as double?,
       longitude: fields[5] as double?,
       createdAt: fields[6] as DateTime,
+      status: fields[7] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Report obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class ReportAdapter extends TypeAdapter<Report> {
       ..writeByte(5)
       ..write(obj.longitude)
       ..writeByte(6)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.status);
   }
 
   @override

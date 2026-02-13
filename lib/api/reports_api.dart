@@ -52,6 +52,13 @@ class ReportsApi {
     await _client.delete(reportByIdEndpoint(id));
   }
 
+  Future<Report> updateReportStatus(String id, String status) async {
+    final data = await _client.patchJson(reportStatusEndpoint(id), {
+      'status': status,
+    });
+    return Report.fromJson(Map<String, dynamic>.from(data));
+  }
+
   Future<Map<String, dynamic>> uploadReportImage(
     String reportId,
     XFile image, {

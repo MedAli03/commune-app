@@ -85,6 +85,16 @@ class ReportsRepository {
     }
   }
 
+  Future<Report> updateReportStatus({
+    required String reportId,
+    required String status,
+  }) async {
+    final updated = await _api.updateReportStatus(reportId, status);
+    final box = Hive.box<Report>(reportsBoxName);
+    await box.put(updated.id, updated);
+    return updated;
+  }
+
   Future<Map<String, dynamic>> uploadReportImage({
     required String reportId,
     required XFile image,
