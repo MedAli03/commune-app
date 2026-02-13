@@ -13,9 +13,14 @@ import '../widgets/empty_state.dart';
 import '../widgets/section_card.dart';
 
 class ReportDetailsScreen extends StatefulWidget {
-  const ReportDetailsScreen({super.key, required this.report});
+  const ReportDetailsScreen({
+    super.key,
+    required this.report,
+    this.isAdmin = false,
+  });
 
   final Report report;
+  final bool isAdmin;
 
   @override
   State<ReportDetailsScreen> createState() => _ReportDetailsScreenState();
@@ -74,6 +79,10 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   }
 
   Future<void> _deleteReport() async {
+    if (!widget.isAdmin) {
+      _showError('Admin login required');
+      return;
+    }
     if (_deleting) {
       return;
     }
@@ -133,6 +142,10 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   }
 
   Future<void> _uploadImage() async {
+    if (!widget.isAdmin) {
+      _showError('Admin login required');
+      return;
+    }
     if (_uploading) {
       return;
     }
@@ -220,6 +233,10 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   }
 
   Future<void> _deleteCurrentImage() async {
+    if (!widget.isAdmin) {
+      _showError('Admin login required');
+      return;
+    }
     if (_images.isEmpty || _uploading) {
       return;
     }
@@ -281,6 +298,10 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   }
 
   Future<void> _updateStatus(String status) async {
+    if (!widget.isAdmin) {
+      _showError('Admin login required');
+      return;
+    }
     if (_updatingStatus || status == _currentStatusValue) {
       return;
     }
@@ -357,45 +378,53 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Status',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      if (_updatingStatus)
-                        const SizedBox(
-                          height: 14,
-                          width: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                    ],
+                  Text(
+                    'Status',
+                    style: Theme.of(context).textTheme.labelSmall,
                   ),
                   const SizedBox(height: AppSpacing.xs),
-                  DropdownButtonFormField<String>(
-                    initialValue: _currentStatusValue,
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'new', child: Text('New')),
-                      DropdownMenuItem(
-                        value: 'inProgress',
-                        child: Text('In Progress'),
-                      ),
-                      DropdownMenuItem(
-                          value: 'resolved', child: Text('Resolved')),
-                    ],
-                    onChanged: _updatingStatus
-                        ? null
-                        : (value) {
-                            if (value != null) {
-                              _updateStatus(value);
-                            }
-                          },
-                  ),
+                  if (widget.isAdmin)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            initialValue: _currentStatusValue,
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              border: OutlineInputBorder(),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                  value: 'new', child: Text('New')),
+                              DropdownMenuItem(
+                                value: 'inProgress',
+                                child: Text('In Progress'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'resolved',
+                                child: Text('Resolved'),
+                              ),
+                            ],
+                            onChanged: _updatingStatus
+                                ? null
+                                : (value) {
+                                    if (value != null) {
+                                      _updateStatus(value);
+                                    }
+                                  },
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        if (_updatingStatus)
+                          const SizedBox(
+                            height: 14,
+                            width: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                      ],
+                    )
+                  else
+                    Text(_statusLabel(_currentStatusValue)),
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     localizations.createdAt,
@@ -413,45 +442,47 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            FilledButton.icon(
-              onPressed: _uploading ? null : _uploadImage,
-              icon: _uploading
-                  ? SizedBox(
-                      height: 16,
-                      width: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        value: _uploadProgress,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                    )
-                  : const Icon(Icons.add_a_photo_outlined),
-              label: Text(
-                _uploading && _uploadProgress != null
-                    ? 'Uploading ${(100 * _uploadProgress!).round()}%'
-                    : 'Add image',
+            if (widget.isAdmin) const SizedBox(height: AppSpacing.lg),
+            if (widget.isAdmin)
+              FilledButton.icon(
+                onPressed: _uploading ? null : _uploadImage,
+                icon: _uploading
+                    ? SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          value: _uploadProgress,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      )
+                    : const Icon(Icons.add_a_photo_outlined),
+                label: Text(
+                  _uploading && _uploadProgress != null
+                      ? 'Uploading ${(100 * _uploadProgress!).round()}%'
+                      : 'Add image',
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            OutlinedButton.icon(
-              onPressed: _deleting ? null : _deleteReport,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-                side: BorderSide(color: Theme.of(context).colorScheme.error),
+            if (widget.isAdmin) const SizedBox(height: AppSpacing.sm),
+            if (widget.isAdmin)
+              OutlinedButton.icon(
+                onPressed: _deleting ? null : _deleteReport,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                  side: BorderSide(color: Theme.of(context).colorScheme.error),
+                ),
+                icon: _deleting
+                    ? SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      )
+                    : const Icon(Icons.delete_outline),
+                label: const Text('Delete report'),
               ),
-              icon: _deleting
-                  ? SizedBox(
-                      height: 16,
-                      width: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    )
-                  : const Icon(Icons.delete_outline),
-              label: const Text('Delete report'),
-            ),
           ],
         ),
       ),
@@ -478,7 +509,7 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
       );
     }
 
-    final canDelete = _images[_currentImageIndex].id != null;
+    final canDelete = widget.isAdmin && _images[_currentImageIndex].id != null;
     return SectionCard(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
@@ -507,15 +538,16 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
                     );
                   },
                 ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: FilledButton.tonalIcon(
-                    onPressed: canDelete ? _deleteCurrentImage : null,
-                    icon: const Icon(Icons.delete_outline, size: 18),
-                    label: const Text('Delete image'),
+                if (widget.isAdmin)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: FilledButton.tonalIcon(
+                      onPressed: canDelete ? _deleteCurrentImage : null,
+                      icon: const Icon(Icons.delete_outline, size: 18),
+                      label: const Text('Delete image'),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

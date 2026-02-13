@@ -36,6 +36,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   bool _loading = true;
   bool _loadingMore = false;
   bool _hasMore = true;
+  bool _isAdmin = false;
   int _page = 1;
   String? _errorMessage;
 
@@ -45,7 +46,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _loadInitial();
+    _bootstrap();
   }
 
   @override
@@ -55,7 +56,33 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     super.dispose();
   }
 
+  Future<void> _bootstrap() async {
+    final isAdmin = await _authSessionService.isAdmin();
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isAdmin = isAdmin;
+    });
+
+    if (!_isAdmin) {
+      setState(() {
+        _loading = false;
+        _hasMore = false;
+        _errorMessage = 'Admin login required';
+      });
+      return;
+    }
+
+    await _loadInitial();
+  }
+
   Future<void> _loadInitial() async {
+    if (!_isAdmin) {
+      return;
+    }
+
     setState(() {
       _loading = true;
       _errorMessage = null;
@@ -70,7 +97,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         perPage: _perPage,
         sortBy: 'created_at',
         sortDirection: 'desc',
-        status: _selectedStatusValue,
+        status: _isAdmin ? _selectedStatusValue : null,
       );
       if (!mounted) {
         return;
@@ -96,7 +123,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Future<void> _loadMore() async {
-    if (_loadingMore || !_hasMore || _loading) {
+    if (!_isAdmin || _loadingMore || !_hasMore || _loading) {
       return;
     }
     setState(() {
@@ -111,7 +138,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         perPage: _perPage,
         sortBy: 'created_at',
         sortDirection: 'desc',
-        status: _selectedStatusValue,
+        status: _isAdmin ? _selectedStatusValue : null,
       );
       if (!mounted) {
         return;
@@ -151,10 +178,12 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   List<Report> get _filteredReports {
     final query = _searchController.text.trim().toLowerCase();
     return _reports.where((report) {
-      final statusMatches = _statusFilter == ReportStatusFilter.all ||
-          _statusFilter == _filterFromStatus(report.status);
-      if (!statusMatches) {
-        return false;
+      if (_isAdmin) {
+        final statusMatches = _statusFilter == ReportStatusFilter.all ||
+            _statusFilter == _filterFromStatus(report.status);
+        if (!statusMatches) {
+          return false;
+        }
       }
 
       if (query.isEmpty) {
@@ -263,11 +292,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Future<void> _openDetails(Report report) async {
-    final isAdmin = await _authSessionService.isAdmin();
-    if (!isAdmin) {
-      if (!mounted) {
-        return;
-      }
+    if (!_isAdmin) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Admin login required')),
       );
@@ -279,7 +304,10 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     }
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ReportDetailsScreen(report: report),
+        builder: (context) => ReportDetailsScreen(
+          report: report,
+          isAdmin: _isAdmin,
+        ),
       ),
     );
     if (result == true && mounted) {
@@ -337,15 +365,16 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    StatusFilterChips(
-                      selected: _statusFilter,
-                      onSelected: (value) {
-                        setState(() {
-                          _statusFilter = value;
-                        });
-                        _loadInitial();
-                      },
-                    ),
+                    if (_isAdmin)
+                      StatusFilterChips(
+                        selected: _statusFilter,
+                        onSelected: (value) {
+                          setState(() {
+                            _statusFilter = value;
+                          });
+                          _loadInitial();
+                        },
+                      ),
                   ],
                 ),
               ),
@@ -404,46 +433,48 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                               statusLabel: _statusLabelFromValue(status),
                               onTap: () => _openDetails(report),
                             ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: PopupMenuButton<String>(
-                                enabled: !updatingStatus,
-                                onSelected: (value) =>
-                                    _changeStatus(report, value),
-                                itemBuilder: (context) => const [
-                                  PopupMenuItem<String>(
-                                    value: 'new',
-                                    child: Text('Mark as New'),
-                                  ),
-                                  PopupMenuItem<String>(
-                                    value: 'inProgress',
-                                    child: Text('Mark as In Progress'),
-                                  ),
-                                  PopupMenuItem<String>(
-                                    value: 'resolved',
-                                    child: Text('Mark as Resolved'),
-                                  ),
-                                ],
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (updatingStatus)
-                                      const SizedBox(
-                                        height: 14,
-                                        width: 14,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2),
-                                      ),
-                                    if (updatingStatus)
-                                      const SizedBox(width: AppSpacing.xs),
-                                    const Text('Change status'),
-                                    const SizedBox(width: AppSpacing.xs),
-                                    const Icon(Icons.arrow_drop_down),
+                            if (_isAdmin) const SizedBox(height: AppSpacing.xs),
+                            if (_isAdmin)
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: PopupMenuButton<String>(
+                                  enabled: !updatingStatus,
+                                  onSelected: (value) =>
+                                      _changeStatus(report, value),
+                                  itemBuilder: (context) => const [
+                                    PopupMenuItem<String>(
+                                      value: 'new',
+                                      child: Text('Mark as New'),
+                                    ),
+                                    PopupMenuItem<String>(
+                                      value: 'inProgress',
+                                      child: Text('Mark as In Progress'),
+                                    ),
+                                    PopupMenuItem<String>(
+                                      value: 'resolved',
+                                      child: Text('Mark as Resolved'),
+                                    ),
                                   ],
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (updatingStatus)
+                                        const SizedBox(
+                                          height: 14,
+                                          width: 14,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                      if (updatingStatus)
+                                        const SizedBox(width: AppSpacing.xs),
+                                      const Text('Change status'),
+                                      const SizedBox(width: AppSpacing.xs),
+                                      const Icon(Icons.arrow_drop_down),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       );
