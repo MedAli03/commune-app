@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -38,7 +40,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
 
-            $status = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
+            $status = match (true) {
+                $e instanceof HttpExceptionInterface => $e->getStatusCode(),
+                $e instanceof AuthenticationException => 401,
+                $e instanceof AuthorizationException => 403,
+                default => 500,
+            };
 
             $message = trim($e->getMessage());
             if ($message === '') {

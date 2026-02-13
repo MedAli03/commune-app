@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Report;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class ReportApiTest extends TestCase
@@ -22,7 +24,7 @@ class ReportApiTest extends TestCase
             ->assertOk()
             ->assertJsonIsArray()
             ->assertJsonStructure([
-                '*' => ['id', 'title', 'description', 'photoPath', 'latitude', 'longitude', 'createdAt'],
+                '*' => ['id', 'title', 'description', 'status', 'photoPath', 'latitude', 'longitude', 'createdAt'],
             ]);
     }
 
@@ -32,7 +34,7 @@ class ReportApiTest extends TestCase
 
         $this->getJson('/reports/'.$report->id)
             ->assertOk()
-            ->assertJsonStructure(['id', 'title', 'description', 'photoPath', 'latitude', 'longitude', 'createdAt']);
+            ->assertJsonStructure(['id', 'title', 'description', 'status', 'photoPath', 'latitude', 'longitude', 'createdAt']);
 
         $this->getJson('/reports/non-existent-id')
             ->assertNotFound()
@@ -58,8 +60,9 @@ class ReportApiTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('title', $payload['title'])
             ->assertJsonPath('description', $payload['description'])
+            ->assertJsonPath('status', 'new')
             ->assertJsonPath('photoPath', $payload['photoPath'])
-            ->assertJsonStructure(['id', 'title', 'description', 'photoPath', 'latitude', 'longitude', 'createdAt']);
+            ->assertJsonStructure(['id', 'title', 'description', 'status', 'photoPath', 'latitude', 'longitude', 'createdAt']);
 
         $this->assertDatabaseHas('reports', [
             'title' => $payload['title'],
@@ -83,21 +86,66 @@ class ReportApiTest extends TestCase
         $this->assertNotEmpty($response->json('details'));
     }
 
-    public function test_delete_report_deletes_and_returns_expected_response(): void
+    public function test_protected_report_actions_require_authentication(): void
     {
         $report = Report::factory()->create();
 
         $this->deleteJson('/reports/'.$report->id)
-            ->assertNoContent();
+            ->assertUnauthorized()
+            ->assertJsonStructure(['message']);
 
-        $this->assertDatabaseMissing('reports', [
+        $this->patchJson('/reports/'.$report->id.'/status', [
+            'status' => Report::STATUS_RESOLVED,
+        ])
+            ->assertUnauthorized()
+            ->assertJsonStructure(['message']);
+    }
+
+    public function test_status_update_works_with_token(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+        Sanctum::actingAs($admin);
+        $report = Report::factory()->create([
+            'status' => Report::STATUS_NEW,
+        ]);
+
+        $response = $this->patchJson('/reports/'.$report->id.'/status', [
+            'status' => Report::STATUS_RESOLVED,
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('id', $report->id)
+            ->assertJsonPath('status', Report::STATUS_RESOLVED);
+
+        $this->assertDatabaseHas('reports', [
             'id' => $report->id,
+            'status' => Report::STATUS_RESOLVED,
         ]);
     }
 
-    public function test_post_images_upload_stores_file_and_returns_expected_shape(): void
+    public function test_delete_report_deletes_and_returns_expected_response_with_token(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+        Sanctum::actingAs($admin);
+        $report = Report::factory()->create();
+
+        $this->deleteJson('/reports/'.$report->id)->assertNoContent();
+
+        $this->assertDatabaseMissing('reports', ['id' => $report->id]);
+    }
+
+    public function test_post_images_upload_stores_file_and_returns_expected_shape_with_token(): void
     {
         Storage::fake('public');
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+        Sanctum::actingAs($admin);
         $report = Report::factory()->create();
 
         $response = $this->post('/reports/'.$report->id.'/images', [
