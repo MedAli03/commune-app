@@ -14,11 +14,17 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 
 class ReportController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection|JsonResponse
     {
+        if (($forbidden = $this->forbiddenUnlessAdmin($request)) !== null) {
+            return $forbidden;
+        }
+
         $perPage = min(max((int) $request->query('perPage', 20), 1), 100);
         $page = max((int) $request->query('page', 1), 1);
 
@@ -58,8 +64,12 @@ class ReportController extends Controller
         return ReportResource::collection($reports);
     }
 
-    public function show(string $id): ReportResource|JsonResponse
+    public function show(Request $request, string $id): ReportResource|JsonResponse
     {
+        if (($forbidden = $this->forbiddenUnlessAdmin($request)) !== null) {
+            return $forbidden;
+        }
+
         $report = Report::query()->find($id);
 
         if ($report === null) {
@@ -91,8 +101,12 @@ class ReportController extends Controller
             ->setStatusCode(201);
     }
 
-    public function destroy(string $id): JsonResponse|Response
+    public function destroy(Request $request, string $id): JsonResponse|Response
     {
+        if (($forbidden = $this->forbiddenUnlessAdmin($request)) !== null) {
+            return $forbidden;
+        }
+
         $report = Report::query()->find($id);
 
         if ($report === null) {
@@ -121,6 +135,10 @@ class ReportController extends Controller
 
     public function updateStatus(UpdateReportStatusRequest $request, string $id): ReportResource|JsonResponse
     {
+        if (($forbidden = $this->forbiddenUnlessAdmin($request)) !== null) {
+            return $forbidden;
+        }
+
         $report = Report::query()->find($id);
 
         if ($report === null) {
@@ -134,5 +152,19 @@ class ReportController extends Controller
         ]);
 
         return new ReportResource($report->refresh());
+    }
+
+    private function forbiddenUnlessAdmin(Request $request): ?JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user instanceof User && Gate::forUser($user)->allows('admin-only')) {
+            return null;
+        }
+
+        return response()->json([
+            'message' => 'Forbidden',
+            'details' => null,
+        ], 403);
     }
 }

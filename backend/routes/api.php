@@ -10,11 +10,11 @@ Route::get('/health', function () {
 });
 
 Route::prefix('reports')->group(function () {
-    Route::get('/', [ReportController::class, 'index']);
-    Route::get('/{id}', [ReportController::class, 'show']);
     Route::post('/', [ReportController::class, 'store']);
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/', [ReportController::class, 'index']);
+        Route::get('/{id}', [ReportController::class, 'show']);
         Route::delete('/{id}', [ReportController::class, 'destroy']);
         Route::patch('/{id}/status', [ReportController::class, 'updateStatus']);
         Route::post('/{id}/images', [ReportImageController::class, 'store']);

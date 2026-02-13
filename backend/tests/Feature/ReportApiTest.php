@@ -14,13 +14,22 @@ class ReportApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_get_reports_returns_expected_shape(): void
+    public function test_get_reports_requires_admin_authentication(): void
     {
+        $this->getJson('/reports')
+            ->assertUnauthorized()
+            ->assertJsonStructure(['message']);
+    }
+
+    public function test_admin_can_get_reports_with_expected_shape(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+        Sanctum::actingAs($admin);
         Report::factory()->count(2)->create();
 
-        $response = $this->getJson('/reports');
-
-        $response
+        $this->getJson('/reports')
             ->assertOk()
             ->assertJsonIsArray()
             ->assertJsonStructure([
@@ -28,8 +37,21 @@ class ReportApiTest extends TestCase
             ]);
     }
 
-    public function test_get_report_by_id_returns_200_for_existing_and_404_for_missing(): void
+    public function test_get_report_by_id_requires_admin_authentication(): void
     {
+        $report = Report::factory()->create();
+
+        $this->getJson('/reports/'.$report->id)
+            ->assertUnauthorized()
+            ->assertJsonStructure(['message']);
+    }
+
+    public function test_admin_get_report_by_id_returns_200_for_existing_and_404_for_missing(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+        Sanctum::actingAs($admin);
         $report = Report::factory()->create();
 
         $this->getJson('/reports/'.$report->id)
@@ -99,6 +121,51 @@ class ReportApiTest extends TestCase
         ])
             ->assertUnauthorized()
             ->assertJsonStructure(['message']);
+
+        $this->postJson('/reports/'.$report->id.'/images', [
+            'image' => UploadedFile::fake()->create('report-image.jpg', 120, 'image/jpeg'),
+        ])
+            ->assertUnauthorized()
+            ->assertJsonStructure(['message']);
+    }
+
+    public function test_non_admin_token_cannot_manage_or_view_reports(): void
+    {
+        $user = User::factory()->create([
+            'is_admin' => false,
+        ]);
+        Sanctum::actingAs($user);
+        $report = Report::factory()->create();
+
+        $this->getJson('/reports')
+            ->assertForbidden()
+            ->assertJson([
+                'message' => 'Forbidden',
+                'details' => null,
+            ]);
+
+        $this->getJson('/reports/'.$report->id)
+            ->assertForbidden()
+            ->assertJson([
+                'message' => 'Forbidden',
+                'details' => null,
+            ]);
+
+        $this->patchJson('/reports/'.$report->id.'/status', [
+            'status' => Report::STATUS_RESOLVED,
+        ])
+            ->assertForbidden()
+            ->assertJson([
+                'message' => 'Forbidden',
+                'details' => null,
+            ]);
+
+        $this->deleteJson('/reports/'.$report->id)
+            ->assertForbidden()
+            ->assertJson([
+                'message' => 'Forbidden',
+                'details' => null,
+            ]);
     }
 
     public function test_status_update_works_with_token(): void
