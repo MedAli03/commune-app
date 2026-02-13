@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
                 icon: const Icon(Icons.dashboard_outlined),
-                label: Text(localizations.myReports),
+                label: const Text('Admin Login'),
               ),
             ),
             const Spacer(),

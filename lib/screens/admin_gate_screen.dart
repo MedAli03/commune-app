@@ -32,9 +32,10 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
 
     try {
       await _authApi.me();
+      await _authSessionService.saveRole('admin');
       return true;
     } catch (_) {
-      await _authSessionService.clearToken();
+      await _authSessionService.clearSession();
       return false;
     }
   }
@@ -45,7 +46,7 @@ class _AdminGateScreenState extends State<AdminGateScreen> {
     } catch (_) {
       // Local token cleanup should still happen even if network call fails.
     } finally {
-      await _authSessionService.clearToken();
+      await _authSessionService.clearSession();
     }
 
     if (!mounted) {

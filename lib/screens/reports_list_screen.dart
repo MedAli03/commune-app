@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../api/app_exception.dart';
+import '../auth/auth_session_service.dart';
 import '../localization/app_localizations.dart';
 import '../models/report.dart';
 import '../repositories/reports_repository.dart';
@@ -25,6 +26,7 @@ class ReportsListScreen extends StatefulWidget {
 
 class _ReportsListScreenState extends State<ReportsListScreen> {
   final _reportsRepository = ReportsRepository();
+  final _authSessionService = const AuthSessionService();
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   final List<Report> _reports = [];
@@ -260,6 +262,31 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return error.toString();
   }
 
+  Future<void> _openDetails(Report report) async {
+    final isAdmin = await _authSessionService.isAdmin();
+    if (!isAdmin) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Admin login required')),
+      );
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ReportDetailsScreen(report: report),
+      ),
+    );
+    if (result == true && mounted) {
+      _loadInitial();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
@@ -375,17 +402,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                             ReportCard(
                               report: report,
                               statusLabel: _statusLabelFromValue(status),
-                              onTap: () async {
-                                final result = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        ReportDetailsScreen(report: report),
-                                  ),
-                                );
-                                if (result == true && mounted) {
-                                  _loadInitial();
-                                }
-                              },
+                              onTap: () => _openDetails(report),
                             ),
                             const SizedBox(height: AppSpacing.xs),
                             Align(

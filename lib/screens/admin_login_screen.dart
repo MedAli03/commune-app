@@ -48,7 +48,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         username: _usernameController.text.trim(),
         password: _passwordController.text,
       );
-      await _authSessionService.saveToken(token);
+      await _authSessionService.saveAdminSession(token);
 
       if (!mounted) {
         return;
@@ -56,6 +56,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
       if (widget.onLoginSuccess != null) {
         widget.onLoginSuccess!();
+      } else {
+        Navigator.of(context).pop(true);
       }
     } catch (error) {
       if (!mounted) {

@@ -11,7 +11,6 @@ import '../theme/app_theme.dart';
 import '../utils/platform_image.dart';
 import '../utils/validators.dart';
 import '../widgets/section_card.dart';
-import 'reports_list_screen.dart';
 
 class CreateReportScreen extends StatefulWidget {
   const CreateReportScreen({super.key});
@@ -354,12 +353,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
 
       final localizations = AppLocalizations.of(context);
       _showSnackBar(localizations.reportSaved);
-
-      await Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const ReportsListScreen(),
-        ),
-      );
+      Navigator.of(context).pop(true);
     } catch (error) {
       if (!mounted) {
         return;
