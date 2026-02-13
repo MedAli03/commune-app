@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Report extends Model
 {
@@ -48,5 +49,9 @@ class Report extends Model
         'longitude' => 'decimal:7',
         'created_at_client' => 'datetime',
     ];
-}
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ReportImage::class);
+    }
+}

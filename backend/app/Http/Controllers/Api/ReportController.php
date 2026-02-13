@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Resources\ReportResource;
 use App\Models\Report;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
@@ -91,7 +93,20 @@ class ReportController extends Controller
             ], 404);
         }
 
-        $report->delete();
+        $paths = [];
+
+        DB::transaction(function () use ($report, &$paths): void {
+            $paths = $report->images()->pluck('path')->filter()->values()->all();
+            $report->delete();
+        });
+
+        if ($paths !== []) {
+            try {
+                Storage::disk('public')->delete($paths);
+            } catch (\Throwable) {
+                // Best effort cleanup. Missing files should not fail request.
+            }
+        }
 
         return response()->noContent();
     }
