@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
 
+import '../auth/auth_session_service.dart';
 import 'api_config.dart';
 import 'app_exception.dart';
 
 class ApiClient {
-  ApiClient({Dio? dio})
-      : _dio = dio ??
+  ApiClient({
+    Dio? dio,
+    AuthSessionService? authSessionService,
+  })  : _authSessionService = authSessionService ?? const AuthSessionService(),
+        _dio = dio ??
             Dio(
               BaseOptions(
                 baseUrl: baseUrl,
@@ -16,8 +20,26 @@ class ApiClient {
                   'Accept': 'application/json',
                 },
               ),
-            );
+            ) {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          options.headers.putIfAbsent('Accept', () => 'application/json');
 
+          final token = await _authSessionService.readToken();
+          if (token == null || token.isEmpty) {
+            options.headers.remove('Authorization');
+          } else {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+
+          handler.next(options);
+        },
+      ),
+    );
+  }
+
+  final AuthSessionService _authSessionService;
   final Dio _dio;
 
   Future<Map<String, dynamic>> getJson(
