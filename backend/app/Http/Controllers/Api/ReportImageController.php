@@ -7,6 +7,7 @@ use App\Http\Requests\StoreReportImageRequest;
 use App\Http\Resources\ReportImageResource;
 use App\Models\Report;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -35,7 +36,7 @@ class ReportImageController extends Controller
         return response()->json((new ReportImageResource($image))->resolve(), 201);
     }
 
-    public function destroy(string $id, int $imageId): JsonResponse
+    public function destroy(string $id, int $imageId): JsonResponse|Response
     {
         $report = Report::query()->find($id);
 
@@ -68,4 +69,3 @@ class ReportImageController extends Controller
         return response()->noContent();
     }
 }
-

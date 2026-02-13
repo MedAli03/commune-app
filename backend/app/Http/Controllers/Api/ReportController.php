@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Resources\ReportResource;
 use App\Models\Report;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -83,7 +84,7 @@ class ReportController extends Controller
             ->setStatusCode(201);
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id): JsonResponse|Response
     {
         $report = Report::query()->find($id);
 
