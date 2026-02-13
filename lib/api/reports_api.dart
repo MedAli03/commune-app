@@ -17,6 +17,7 @@ class ReportsApi {
     String? sortBy,
     String? sortDirection,
     String? search,
+    String? status,
   }) async {
     final query = <String, dynamic>{
       if (page != null) 'page': page,
@@ -25,6 +26,7 @@ class ReportsApi {
       if (sortDirection != null && sortDirection.isNotEmpty)
         'sortDirection': sortDirection,
       if (search != null && search.isNotEmpty) 'search': search,
+      if (status != null && status.isNotEmpty) 'status': status,
     };
 
     final data = await _client.getJsonList(

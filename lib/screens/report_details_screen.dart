@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../api/api_config.dart';
 import '../api/app_exception.dart';
 import '../localization/app_localizations.dart';
 import '../models/report.dart';
 import '../repositories/reports_repository.dart';
 import '../services/photo_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/media_url.dart';
 import '../utils/platform_image.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/section_card.dart';
@@ -31,6 +31,7 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   bool _loading = false;
   bool _deleting = false;
   bool _uploading = false;
+  bool _updatingStatus = false;
   double? _uploadProgress;
   int _currentImageIndex = 0;
 
@@ -279,6 +280,43 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
     }
   }
 
+  Future<void> _updateStatus(String status) async {
+    if (_updatingStatus || status == _currentStatusValue) {
+      return;
+    }
+
+    setState(() {
+      _updatingStatus = true;
+    });
+
+    try {
+      final updated = await _reportsRepository.updateReportStatus(
+        reportId: _report.id,
+        status: status,
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _report = updated;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status updated to ${_statusLabel(status)}')),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      _showError(_readableError(error));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _updatingStatus = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
@@ -319,6 +357,46 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Status',
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      if (_updatingStatus)
+                        const SizedBox(
+                          height: 14,
+                          width: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  DropdownButtonFormField<String>(
+                    initialValue: _currentStatusValue,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'new', child: Text('New')),
+                      DropdownMenuItem(
+                        value: 'inProgress',
+                        child: Text('In Progress'),
+                      ),
+                      DropdownMenuItem(
+                          value: 'resolved', child: Text('Resolved')),
+                    ],
+                    onChanged: _updatingStatus
+                        ? null
+                        : (value) {
+                            if (value != null) {
+                              _updateStatus(value);
+                            }
+                          },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
                   Text(
                     localizations.createdAt,
                     style: Theme.of(context).textTheme.labelSmall,
@@ -493,10 +571,31 @@ class _ReportDetailsScreenState extends State<ReportDetailsScreen> {
   }
 
   String _resolveImageUrl(String value) {
-    if (value.startsWith('/storage/')) {
-      return '$baseUrl$value';
+    return resolveMediaUrl(value);
+  }
+
+  String get _currentStatusValue {
+    switch (_report.status) {
+      case 'resolved':
+        return 'resolved';
+      case 'inProgress':
+        return 'inProgress';
+      case 'new':
+      default:
+        return 'new';
     }
-    return value;
+  }
+
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'resolved':
+        return 'Resolved';
+      case 'inProgress':
+        return 'In Progress';
+      case 'new':
+      default:
+        return 'New';
+    }
   }
 
   void _showError(String message) {
@@ -581,7 +680,7 @@ class _ImageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
+    if (isNetworkImageUrl(pathOrUrl)) {
       return Image.network(
         pathOrUrl,
         fit: BoxFit.cover,
@@ -620,7 +719,7 @@ class _ReportImage {
     final value = json['url']?.toString() ?? json['path']?.toString() ?? '';
     return _ReportImage(
       id: json['id']?.toString(),
-      url: value.startsWith('/storage/') ? '$baseUrl$value' : value,
+      url: resolveMediaUrl(value),
     );
   }
 }

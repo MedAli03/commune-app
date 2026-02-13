@@ -28,6 +28,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   final List<Report> _reports = [];
+  final Set<String> _updatingStatusIds = <String>{};
 
   ReportStatusFilter _statusFilter = ReportStatusFilter.all;
   bool _loading = true;
@@ -67,6 +68,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         perPage: _perPage,
         sortBy: 'created_at',
         sortDirection: 'desc',
+        status: _selectedStatusValue,
       );
       if (!mounted) {
         return;
@@ -107,6 +109,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         perPage: _perPage,
         sortBy: 'created_at',
         sortDirection: 'desc',
+        status: _selectedStatusValue,
       );
       if (!mounted) {
         return;
@@ -146,9 +149,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   List<Report> get _filteredReports {
     final query = _searchController.text.trim().toLowerCase();
     return _reports.where((report) {
-      final status = _inferStatus(report);
-      final statusMatches =
-          _statusFilter == ReportStatusFilter.all || _statusFilter == status;
+      final statusMatches = _statusFilter == ReportStatusFilter.all ||
+          _statusFilter == _filterFromStatus(report.status);
       if (!statusMatches) {
         return false;
       }
@@ -161,31 +163,84 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     }).toList();
   }
 
-  ReportStatusFilter _inferStatus(Report report) {
-    final normalizedTitle = report.title.toLowerCase();
-    final normalizedDescription = report.description.toLowerCase();
-    if (normalizedTitle.contains('resolved') ||
-        normalizedTitle.contains('fixed') ||
-        normalizedDescription.contains('resolved') ||
-        normalizedDescription.contains('fixed')) {
-      return ReportStatusFilter.resolved;
+  String? get _selectedStatusValue {
+    switch (_statusFilter) {
+      case ReportStatusFilter.all:
+        return null;
+      case ReportStatusFilter.newReport:
+        return 'new';
+      case ReportStatusFilter.inProgress:
+        return 'inProgress';
+      case ReportStatusFilter.resolved:
+        return 'resolved';
     }
-    if (report.photoPath != null && report.photoPath!.isNotEmpty) {
-      return ReportStatusFilter.inProgress;
-    }
-    return ReportStatusFilter.newReport;
   }
 
-  String _statusLabel(ReportStatusFilter status) {
+  ReportStatusFilter _filterFromStatus(String? status) {
     switch (status) {
-      case ReportStatusFilter.all:
-        return 'All';
-      case ReportStatusFilter.newReport:
-        return 'New';
-      case ReportStatusFilter.inProgress:
-        return 'In Progress';
-      case ReportStatusFilter.resolved:
+      case 'resolved':
+        return ReportStatusFilter.resolved;
+      case 'inProgress':
+        return ReportStatusFilter.inProgress;
+      case 'new':
+      default:
+        return ReportStatusFilter.newReport;
+    }
+  }
+
+  String _statusLabelFromValue(String? status) {
+    switch (status) {
+      case 'resolved':
         return 'Resolved';
+      case 'inProgress':
+        return 'In Progress';
+      case 'new':
+      default:
+        return 'New';
+    }
+  }
+
+  Future<void> _changeStatus(Report report, String nextStatus) async {
+    if (_updatingStatusIds.contains(report.id)) {
+      return;
+    }
+
+    setState(() {
+      _updatingStatusIds.add(report.id);
+    });
+
+    try {
+      final updated = await _reportsRepository.updateReportStatus(
+        reportId: report.id,
+        status: nextStatus,
+      );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        final index = _reports.indexWhere((item) => item.id == updated.id);
+        if (index != -1) {
+          _reports[index] = updated;
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text('Status updated to ${_statusLabelFromValue(nextStatus)}')),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_readableError(error))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _updatingStatusIds.remove(report.id);
+        });
+      }
     }
   }
 
@@ -261,6 +316,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                         setState(() {
                           _statusFilter = value;
                         });
+                        _loadInitial();
                       },
                     ),
                   ],
@@ -304,24 +360,74 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final report = filteredReports[index];
-                      final status = _inferStatus(report);
+                      final status = report.status;
+                      final updatingStatus =
+                          _updatingStatusIds.contains(report.id);
                       return Padding(
                         padding: EdgeInsets.only(
                           bottom: index == filteredReports.length - 1
                               ? 0
                               : AppSpacing.md,
                         ),
-                        child: ReportCard(
-                          report: report,
-                          statusLabel: _statusLabel(status),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ReportDetailsScreen(report: report),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ReportCard(
+                              report: report,
+                              statusLabel: _statusLabelFromValue(status),
+                              onTap: () async {
+                                final result = await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ReportDetailsScreen(report: report),
+                                  ),
+                                );
+                                if (result == true && mounted) {
+                                  _loadInitial();
+                                }
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: PopupMenuButton<String>(
+                                enabled: !updatingStatus,
+                                onSelected: (value) =>
+                                    _changeStatus(report, value),
+                                itemBuilder: (context) => const [
+                                  PopupMenuItem<String>(
+                                    value: 'new',
+                                    child: Text('Mark as New'),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'inProgress',
+                                    child: Text('Mark as In Progress'),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'resolved',
+                                    child: Text('Mark as Resolved'),
+                                  ),
+                                ],
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (updatingStatus)
+                                      const SizedBox(
+                                        height: 14,
+                                        width: 14,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2),
+                                      ),
+                                    if (updatingStatus)
+                                      const SizedBox(width: AppSpacing.xs),
+                                    const Text('Change status'),
+                                    const SizedBox(width: AppSpacing.xs),
+                                    const Icon(Icons.arrow_drop_down),
+                                  ],
+                                ),
                               ),
-                            );
-                          },
+                            ),
+                          ],
                         ),
                       );
                     },

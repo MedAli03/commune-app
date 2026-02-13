@@ -19,6 +19,7 @@ class ReportsRepository {
     String? sortBy,
     String? sortDirection,
     String? search,
+    String? status,
   }) async {
     return _api.fetchReports(
       page: page,
@@ -26,6 +27,7 @@ class ReportsRepository {
       sortBy: sortBy,
       sortDirection: sortDirection,
       search: search,
+      status: status,
     );
   }
 
