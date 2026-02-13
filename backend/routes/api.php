@@ -13,9 +13,13 @@ Route::prefix('reports')->group(function () {
     Route::get('/', [ReportController::class, 'index']);
     Route::get('/{id}', [ReportController::class, 'show']);
     Route::post('/', [ReportController::class, 'store']);
-    Route::delete('/{id}', [ReportController::class, 'destroy']);
-    Route::post('/{id}/images', [ReportImageController::class, 'store']);
-    Route::delete('/{id}/images/{imageId}', [ReportImageController::class, 'destroy']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::delete('/{id}', [ReportController::class, 'destroy']);
+        Route::patch('/{id}/status', [ReportController::class, 'updateStatus']);
+        Route::post('/{id}/images', [ReportImageController::class, 'store']);
+        Route::delete('/{id}/images/{imageId}', [ReportImageController::class, 'destroy']);
+    });
 });
 
 Route::prefix('admin')->group(function () {

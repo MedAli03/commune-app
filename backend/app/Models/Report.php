@@ -10,6 +10,10 @@ class Report extends Model
 {
     use HasFactory;
 
+    public const STATUS_NEW = 'new';
+    public const STATUS_IN_PROGRESS = 'inProgress';
+    public const STATUS_RESOLVED = 'resolved';
+
     /**
      * The primary key type is UUID.
      *
@@ -33,6 +37,7 @@ class Report extends Model
         'id',
         'title',
         'description',
+        'status',
         'photo_path',
         'latitude',
         'longitude',
@@ -49,6 +54,18 @@ class Report extends Model
         'longitude' => 'decimal:7',
         'created_at_client' => 'datetime',
     ];
+
+    /**
+     * @return list<string>
+     */
+    public static function allowedStatuses(): array
+    {
+        return [
+            self::STATUS_NEW,
+            self::STATUS_IN_PROGRESS,
+            self::STATUS_RESOLVED,
+        ];
+    }
 
     public function images(): HasMany
     {

@@ -21,6 +21,7 @@ class ReportResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
+            'status' => $this->status,
             'photoPath' => $this->photo_path,
             'latitude' => $this->latitude !== null ? (float) $this->latitude : null,
             'longitude' => $this->longitude !== null ? (float) $this->longitude : null,
@@ -28,4 +29,3 @@ class ReportResource extends JsonResource
         ];
     }
 }
-

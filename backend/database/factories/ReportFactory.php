@@ -29,6 +29,7 @@ class ReportFactory extends Factory
             'id' => (string) Str::uuid(),
             'title' => fake()->sentence(6),
             'description' => fake()->paragraph(2),
+            'status' => fake()->randomElement(Report::allowedStatuses()),
             'photo_path' => fake()->boolean(35) ? '/storage/reports/'.fake()->uuid().'.jpg' : null,
             'latitude' => fake()->optional(0.85)->latitude(),
             'longitude' => fake()->optional(0.85)->longitude(),
@@ -36,4 +37,3 @@ class ReportFactory extends Factory
         ];
     }
 }
-

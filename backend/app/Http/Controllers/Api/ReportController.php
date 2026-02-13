@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReportRequest;
+use App\Http\Requests\UpdateReportStatusRequest;
 use App\Http\Resources\ReportResource;
 use App\Models\Report;
 use Illuminate\Http\Response;
@@ -33,6 +34,7 @@ class ReportController extends Controller
         }
 
         $search = trim((string) $request->query('search', ''));
+        $status = (string) $request->query('status', '');
 
         $query = Report::query();
 
@@ -42,6 +44,10 @@ class ReportController extends Controller
                     ->where('title', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             });
+        }
+
+        if (in_array($status, Report::allowedStatuses(), true)) {
+            $query->where('status', $status);
         }
 
         $reports = $query
@@ -73,6 +79,7 @@ class ReportController extends Controller
             'id' => $validated['id'] ?? (string) Str::uuid(),
             'title' => $validated['title'],
             'description' => $validated['description'],
+            'status' => Report::STATUS_NEW,
             'photo_path' => $validated['photoPath'] ?? null,
             'latitude' => $validated['latitude'] ?? null,
             'longitude' => $validated['longitude'] ?? null,
@@ -110,5 +117,22 @@ class ReportController extends Controller
         }
 
         return response()->noContent();
+    }
+
+    public function updateStatus(UpdateReportStatusRequest $request, string $id): ReportResource|JsonResponse
+    {
+        $report = Report::query()->find($id);
+
+        if ($report === null) {
+            return response()->json([
+                'message' => 'Report not found',
+            ], 404);
+        }
+
+        $report->update([
+            'status' => $request->validated('status'),
+        ]);
+
+        return new ReportResource($report->refresh());
     }
 }
