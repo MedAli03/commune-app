@@ -3,5 +3,7 @@ const String baseUrl = String.fromEnvironment(
   defaultValue: 'http://127.0.0.1:8000',
 );
 
-String reportsEndpoint() => '$baseUrl/reports';
-String reportByIdEndpoint(String id) => '$baseUrl/reports/$id';
+const String reportsPath = '/reports';
+
+String reportsEndpoint() => reportsPath;
+String reportByIdEndpoint(String id) => '$reportsPath/$id';

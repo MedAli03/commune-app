@@ -76,6 +76,16 @@ class ApiClient {
     }
   }
 
+  Future<void> delete(String url) async {
+    try {
+      await _dio.delete<dynamic>(url);
+    } on DioException catch (error) {
+      throw _normalizeDioError(error);
+    } catch (_) {
+      throw AppException(message: 'Unexpected network error.');
+    }
+  }
+
   Map<String, dynamic> _decodeObjectBody(dynamic body) {
     if (body == null) {
       return <String, dynamic>{};

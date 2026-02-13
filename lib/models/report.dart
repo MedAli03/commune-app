@@ -48,7 +48,7 @@ class Report extends HiveObject {
   }
 
   factory Report.fromJson(Map<String, dynamic> json) {
-    final createdAtValue = json['createdAt'];
+    final createdAtValue = json['createdAt'] ?? json['created_at'];
     final createdAt = createdAtValue is DateTime
         ? createdAtValue
         : createdAtValue is String
@@ -63,7 +63,7 @@ class Report extends HiveObject {
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
-      photoPath: json['photoPath'] as String?,
+      photoPath: (json['photoPath'] ?? json['photo_path'])?.toString(),
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       createdAt: createdAt,

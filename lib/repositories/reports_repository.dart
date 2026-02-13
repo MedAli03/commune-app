@@ -37,4 +37,20 @@ class ReportsRepository {
       debugPrintStack(stackTrace: stackTrace);
     }
   }
+
+  Future<void> deleteReportAndSync(String reportId) async {
+    final box = Hive.box<Report>(reportsBoxName);
+    final localReport = box.get(reportId);
+    await box.delete(reportId);
+
+    try {
+      await _api.deleteReport(reportId);
+    } catch (error, stackTrace) {
+      if (localReport != null) {
+        await box.put(localReport.id, localReport);
+      }
+      debugPrint('Delete report sync failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
 }
