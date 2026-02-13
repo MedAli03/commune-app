@@ -1,96 +1,159 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 
-import 'package:http/http.dart' as http;
+import 'api_config.dart';
+import 'app_exception.dart';
 
 class ApiClient {
-  ApiClient({http.Client? client}) : _client = client ?? http.Client();
+  ApiClient({Dio? dio})
+      : _dio = dio ??
+            Dio(
+              BaseOptions(
+                baseUrl: baseUrl,
+                connectTimeout: const Duration(seconds: 10),
+                sendTimeout: const Duration(seconds: 15),
+                receiveTimeout: const Duration(seconds: 15),
+                headers: const {
+                  'Accept': 'application/json',
+                },
+              ),
+            );
 
-  final http.Client _client;
+  final Dio _dio;
 
-  Future<Map<String, dynamic>> getJson(String url) async {
-    final response = await _client.get(
-      Uri.parse(url),
-      headers: _jsonHeaders(),
-    );
-    return _handleResponse(response);
+  Future<Map<String, dynamic>> getJson(
+    String url, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    try {
+      final response = await _dio.get<dynamic>(
+        url,
+        queryParameters: queryParameters,
+      );
+      return _decodeObjectBody(response.data);
+    } on DioException catch (error) {
+      throw _normalizeDioError(error);
+    } catch (_) {
+      throw AppException(message: 'Unexpected network error.');
+    }
   }
 
-  Future<List<dynamic>> getJsonList(String url) async {
-    final response = await _client.get(
-      Uri.parse(url),
-      headers: _jsonHeaders(),
-    );
-    return _handleListResponse(response);
+  Future<List<dynamic>> getJsonList(
+    String url, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    try {
+      final response = await _dio.get<dynamic>(
+        url,
+        queryParameters: queryParameters,
+      );
+      return _decodeListBody(response.data);
+    } on DioException catch (error) {
+      throw _normalizeDioError(error);
+    } catch (_) {
+      throw AppException(message: 'Unexpected network error.');
+    }
   }
 
   Future<Map<String, dynamic>> postJson(
     String url,
     Map<String, dynamic> body,
   ) async {
-    final response = await _client.post(
-      Uri.parse(url),
-      headers: _jsonHeaders(),
-      body: jsonEncode(body),
-    );
-    return _handleResponse(response);
+    try {
+      final response = await _dio.post<dynamic>(
+        url,
+        data: body,
+        options: Options(
+          headers: const {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      return _decodeObjectBody(response.data);
+    } on DioException catch (error) {
+      throw _normalizeDioError(error);
+    } catch (_) {
+      throw AppException(message: 'Unexpected network error.');
+    }
   }
 
-  Map<String, String> _jsonHeaders() => const {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-
-  Map<String, dynamic> _handleResponse(http.Response response) {
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(_buildErrorMessage(response));
-    }
-    final body = response.body.trim();
-    if (body.isEmpty) {
+  Map<String, dynamic> _decodeObjectBody(dynamic body) {
+    if (body == null) {
       return <String, dynamic>{};
     }
-    final decoded = jsonDecode(body);
-    if (decoded is Map<String, dynamic>) {
-      return decoded;
+    if (body is Map<String, dynamic>) {
+      return body;
     }
-    throw Exception('Unexpected response format.');
+    if (body is Map) {
+      return Map<String, dynamic>.from(body);
+    }
+    throw AppException(message: 'Unexpected response format.');
   }
 
-  List<dynamic> _handleListResponse(http.Response response) {
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(_buildErrorMessage(response));
-    }
-    final body = response.body.trim();
-    if (body.isEmpty) {
+  List<dynamic> _decodeListBody(dynamic body) {
+    if (body == null) {
       return <dynamic>[];
     }
-    final decoded = jsonDecode(body);
-    if (decoded is List) {
-      return decoded;
+    if (body is List) {
+      return body;
     }
-    throw Exception('Unexpected response format.');
+    throw AppException(message: 'Unexpected response format.');
   }
 
-  String _buildErrorMessage(http.Response response) {
-    final status = response.statusCode;
-    final body = response.body.trim();
-    if (body.isEmpty) {
-      return 'Request failed ($status).';
+  AppException _normalizeDioError(DioException error) {
+    final statusCode = error.response?.statusCode;
+    final data = error.response?.data;
+
+    if (data is Map) {
+      final mapData = Map<String, dynamic>.from(data);
+      final message = mapData['message']?.toString().trim().isNotEmpty == true
+          ? mapData['message'].toString()
+          : _defaultStatusMessage(statusCode);
+      return AppException(
+        message: message,
+        statusCode: statusCode,
+        details: _normalizeDetails(mapData['details']),
+      );
     }
-    try {
-      final decoded = jsonDecode(body);
-      if (decoded is Map<String, dynamic>) {
-        final message = decoded['message']?.toString();
-        final details = decoded['details'];
-        if (details is List && details.isNotEmpty) {
-          return 'Request failed ($status): $message (${details.join(', ')})';
-        }
-        if (message != null && message.isNotEmpty) {
-          return 'Request failed ($status): $message';
-        }
-      }
-    } catch (_) {
-      // Fall through to raw body.
+
+    final fallbackMessage = _extractFallbackMessage(error);
+    return AppException(
+      message: fallbackMessage,
+      statusCode: statusCode,
+    );
+  }
+
+  Map<String, dynamic>? _normalizeDetails(dynamic details) {
+    if (details == null) {
+      return null;
     }
-    return 'Request failed ($status): $body';
+    if (details is Map) {
+      return Map<String, dynamic>.from(details);
+    }
+    if (details is List) {
+      return <String, dynamic>{
+        'errors': details.map((item) => item.toString()).toList(),
+      };
+    }
+    return <String, dynamic>{
+      'value': details.toString(),
+    };
+  }
+
+  String _extractFallbackMessage(DioException error) {
+    final responseData = error.response?.data;
+    if (responseData is String && responseData.trim().isNotEmpty) {
+      return responseData.trim();
+    }
+    if (error.message != null && error.message!.trim().isNotEmpty) {
+      return error.message!.trim();
+    }
+    return _defaultStatusMessage(error.response?.statusCode);
+  }
+
+  String _defaultStatusMessage(int? statusCode) {
+    if (statusCode != null) {
+      return 'Request failed ($statusCode).';
+    }
+    return 'Request failed.';
   }
 }

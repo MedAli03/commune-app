@@ -41,6 +41,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   http: ^1.2.2
+  dio: ^5.7.0
   image_picker: ^1.1.2
   intl: 0.20.2
   path_provider: ^2.1.4
