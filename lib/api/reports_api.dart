@@ -1,6 +1,10 @@
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../models/report.dart';
 import 'api_client.dart';
 import 'api_config.dart';
+import 'app_exception.dart';
 
 class ReportsApi {
   ReportsApi({ApiClient? client}) : _client = client ?? ApiClient();
@@ -46,5 +50,55 @@ class ReportsApi {
 
   Future<void> deleteReport(String id) async {
     await _client.delete(reportByIdEndpoint(id));
+  }
+
+  Future<Map<String, dynamic>> uploadReportImage(
+    String reportId,
+    XFile image,
+  ) async {
+    try {
+      return await _uploadReportImageWithField(
+        reportId: reportId,
+        image: image,
+        fieldName: 'image',
+      );
+    } on AppException catch (error) {
+      final shouldFallback = error.statusCode == 400 ||
+          error.statusCode == 422 ||
+          error.message.toLowerCase().contains('image');
+      if (!shouldFallback) {
+        rethrow;
+      }
+
+      return _uploadReportImageWithField(
+        reportId: reportId,
+        image: image,
+        fieldName: 'file',
+      );
+    }
+  }
+
+  Future<void> deleteReportImage(String reportId, String imageId) async {
+    await _client.delete(reportImageByIdEndpoint(reportId, imageId));
+  }
+
+  Future<Map<String, dynamic>> _uploadReportImageWithField({
+    required String reportId,
+    required XFile image,
+    required String fieldName,
+  }) async {
+    final fileName = image.name.isNotEmpty ? image.name : 'upload.jpg';
+    final multipart = await MultipartFile.fromFile(
+      image.path,
+      filename: fileName,
+    );
+    final formData = FormData.fromMap({
+      fieldName: multipart,
+    });
+
+    return _client.postMultipart(
+      reportImagesEndpoint(reportId),
+      formData,
+    );
   }
 }

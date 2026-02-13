@@ -1,3 +1,5 @@
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
@@ -9,6 +11,7 @@ class ReportsRepository {
   ReportsRepository({ReportsApi? api}) : _api = api ?? ReportsApi();
 
   final ReportsApi _api;
+  final _uuid = const Uuid();
 
   Future<void> syncFromServer() async {
     try {
@@ -50,6 +53,43 @@ class ReportsRepository {
         await box.put(localReport.id, localReport);
       }
       debugPrint('Delete report sync failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> runApiSmokeTest({String? sampleImagePath}) async {
+    if (!kDebugMode) {
+      return;
+    }
+
+    try {
+      final list = await _api.fetchReports(perPage: 20);
+      debugPrint('API smoke: fetched reports count=${list.length}');
+
+      final created = await _api.createReport(
+        Report(
+          id: _uuid.v4(),
+          title: 'Smoke test report',
+          description: 'Smoke test report created from debug API check.',
+          photoPath: null,
+          latitude: null,
+          longitude: null,
+          createdAt: DateTime.now().toUtc(),
+        ),
+      );
+      debugPrint('API smoke: created report id=${created.id}');
+
+      if (sampleImagePath != null && sampleImagePath.isNotEmpty) {
+        final imageResponse = await _api.uploadReportImage(
+          created.id,
+          XFile(sampleImagePath),
+        );
+        debugPrint('API smoke: uploaded image response=$imageResponse');
+      } else {
+        debugPrint('API smoke: image upload skipped (no sample image path).');
+      }
+    } catch (error, stackTrace) {
+      debugPrint('API smoke failed: $error');
       debugPrintStack(stackTrace: stackTrace);
     }
   }

@@ -7,3 +7,6 @@ const String reportsPath = '/reports';
 
 String reportsEndpoint() => reportsPath;
 String reportByIdEndpoint(String id) => '$reportsPath/$id';
+String reportImagesEndpoint(String reportId) => '$reportsPath/$reportId/images';
+String reportImageByIdEndpoint(String reportId, String imageId) =>
+    '${reportImagesEndpoint(reportId)}/$imageId';

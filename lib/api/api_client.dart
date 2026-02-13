@@ -86,6 +86,28 @@ class ApiClient {
     }
   }
 
+  Future<Map<String, dynamic>> postMultipart(
+    String url,
+    FormData formData,
+  ) async {
+    try {
+      final response = await _dio.post<dynamic>(
+        url,
+        data: formData,
+        options: Options(
+          headers: const {
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+      return _decodeObjectBody(response.data);
+    } on DioException catch (error) {
+      throw _normalizeDioError(error);
+    } catch (_) {
+      throw AppException(message: 'Unexpected network error.');
+    }
+  }
+
   Map<String, dynamic> _decodeObjectBody(dynamic body) {
     if (body == null) {
       return <String, dynamic>{};
