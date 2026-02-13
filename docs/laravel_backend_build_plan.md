@@ -196,6 +196,12 @@
 - Optional index: `(created_at)` for sorting recent reports.
 - Optional geospatial optimization later if map queries are added.
 
+## MySQL runtime assumptions (phase 2)
+
+- `DB_CONNECTION=mysql` in `.env`.
+- MySQL connection should keep Laravel defaults: `charset=utf8mb4`, `collation=utf8mb4_unicode_ci`, `strict=true`.
+- These defaults are required for predictable validation and Unicode-safe text storage.
+
 ---
 
 ## C) Auth / Roles
