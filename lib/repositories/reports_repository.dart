@@ -13,6 +13,22 @@ class ReportsRepository {
   final ReportsApi _api;
   final _uuid = const Uuid();
 
+  Future<List<Report>> fetchReportsPage({
+    int page = 1,
+    int perPage = 20,
+    String? sortBy,
+    String? sortDirection,
+    String? search,
+  }) async {
+    return _api.fetchReports(
+      page: page,
+      perPage: perPage,
+      sortBy: sortBy,
+      sortDirection: sortDirection,
+      search: search,
+    );
+  }
+
   Future<void> syncFromServer() async {
     try {
       final reports = await _api.fetchReports();
