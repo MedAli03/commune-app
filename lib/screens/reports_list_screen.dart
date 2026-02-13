@@ -12,7 +12,12 @@ import '../widgets/status_filter_chips.dart';
 import 'report_details_screen.dart';
 
 class ReportsListScreen extends StatefulWidget {
-  const ReportsListScreen({super.key});
+  const ReportsListScreen({
+    super.key,
+    this.onLogoutRequested,
+  });
+
+  final Future<void> Function()? onLogoutRequested;
 
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -208,6 +213,23 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.myReports),
+        actions: [
+          if (widget.onLogoutRequested != null)
+            PopupMenuButton<String>(
+              onSelected: (value) async {
+                if (value != 'logout') {
+                  return;
+                }
+                await widget.onLogoutRequested!();
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Text('Logout'),
+                ),
+              ],
+            ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,

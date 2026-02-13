@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../widgets/section_card.dart';
+import 'admin_gate_screen.dart';
 import 'create_report_screen.dart';
-import 'reports_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const ReportsListScreen(),
+                      builder: (context) => const AdminGateScreen(),
                     ),
                   );
                 },
