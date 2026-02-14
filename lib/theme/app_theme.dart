@@ -1,45 +1,98 @@
 import 'package:flutter/material.dart';
 
 class AppSpacing {
-  static const double xs = 4;
-  static const double sm = 8;
-  static const double md = 12;
-  static const double lg = 16;
-  static const double xl = 24;
-  static const double xxl = 32;
+  static const double xs = 8;
+  static const double sm = 12;
+  static const double md = 16;
+  static const double lg = 24;
+  static const double xl = 32;
+  static const double xxl = 40;
 }
 
 class AppRadii {
-  static const BorderRadius sm = BorderRadius.all(Radius.circular(8));
-  static const BorderRadius md = BorderRadius.all(Radius.circular(12));
+  static const BorderRadius sm = BorderRadius.all(Radius.circular(12));
+  static const BorderRadius md = BorderRadius.all(Radius.circular(14));
   static const BorderRadius lg = BorderRadius.all(Radius.circular(16));
-  static const BorderRadius xl = BorderRadius.all(Radius.circular(20));
+  static const BorderRadius xl = BorderRadius.all(Radius.circular(24));
+}
+
+class AppPalette {
+  static const Color accentGreen = Color(0xFF5BE855);
+  static const Color backgroundDark = Color(0xFF091326);
+  static const Color surface = Color(0xFF111E2E);
+  static const Color surfaceAlt = Color(0xFF17263A);
+  static const Color textPrimary = Color(0xFFF1F5F9);
+  static const Color textMuted = Color(0xFFA0AEC0);
+  static const Color outline = Color(0xFF2A3A4D);
+  static const Color outlineSoft = Color(0xFF233448);
+}
+
+class AppTextStyles {
+  static const TextStyle titleLarge = TextStyle(
+    fontSize: 28,
+    fontWeight: FontWeight.w700,
+    height: 1.2,
+    color: AppPalette.textPrimary,
+  );
+
+  static const TextStyle subtitleGreen = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: AppPalette.accentGreen,
+    height: 1.3,
+  );
+
+  static const TextStyle metaMuted = TextStyle(
+    fontSize: 12,
+    letterSpacing: 0.5,
+    fontWeight: FontWeight.w500,
+    color: AppPalette.textMuted,
+  );
 }
 
 class AppTheme {
   static ThemeData light() {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF0B6E4F),
+      seedColor: AppPalette.accentGreen,
       brightness: Brightness.light,
     );
-    return _buildTheme(colorScheme);
+    return _buildTheme(colorScheme, isDark: false);
   }
 
   static ThemeData dark() {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF0B6E4F),
+    final colorScheme = const ColorScheme(
       brightness: Brightness.dark,
+      primary: AppPalette.accentGreen,
+      onPrimary: Color(0xFF032204),
+      secondary: AppPalette.accentGreen,
+      onSecondary: Color(0xFF032204),
+      error: Color(0xFFFF6B6B),
+      onError: Color(0xFFFFFFFF),
+      surface: AppPalette.surface,
+      onSurface: AppPalette.textPrimary,
+    ).copyWith(
+      onSurfaceVariant: AppPalette.textMuted,
+      outline: AppPalette.outline,
+      outlineVariant: AppPalette.outlineSoft,
+      surfaceContainerLow: AppPalette.surface,
+      surfaceContainer: AppPalette.surfaceAlt,
+      surfaceContainerHighest: AppPalette.surfaceAlt,
     );
-    return _buildTheme(colorScheme);
+    return _buildTheme(
+      colorScheme,
+      isDark: true,
+    );
   }
 
-  static ThemeData _buildTheme(ColorScheme colorScheme) {
-    final baseText = Typography.material2021().black;
+  static ThemeData _buildTheme(
+    ColorScheme colorScheme, {
+    required bool isDark,
+  }) {
+    final baseText = isDark
+        ? Typography.material2021().white
+        : Typography.material2021().black;
     final textTheme = baseText.copyWith(
-      titleLarge: baseText.titleLarge?.copyWith(
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.2,
-      ),
+      titleLarge: AppTextStyles.titleLarge,
       titleMedium: baseText.titleMedium?.copyWith(
         fontWeight: FontWeight.w600,
       ),
@@ -65,16 +118,17 @@ class AppTheme {
         bodyColor: colorScheme.onSurface,
         displayColor: colorScheme.onSurface,
       ),
-      scaffoldBackgroundColor: colorScheme.surface,
+      scaffoldBackgroundColor:
+          isDark ? AppPalette.backgroundDark : colorScheme.surface,
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
-        backgroundColor: colorScheme.surface,
+        backgroundColor: Colors.transparent,
         foregroundColor: colorScheme.onSurface,
       ),
       cardTheme: CardThemeData(
         elevation: 0,
-        color: colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainer,
         shape: RoundedRectangleBorder(
           borderRadius: AppRadii.lg,
           side: BorderSide(color: colorScheme.outlineVariant),
