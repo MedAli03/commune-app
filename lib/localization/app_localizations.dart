@@ -1,92 +1,49 @@
-import 'dart:convert';
+import 'package:flutter/widgets.dart';
+import '../l10n/app_localizations.dart' as gen;
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
+/// Compatibility wrapper while screens migrate to generated l10n API.
 class AppLocalizations {
-  AppLocalizations(this.locale);
+  AppLocalizations._(this._l10n);
 
-  final Locale locale;
-  late final Map<String, String> _localizedStrings;
-
-  static const supportedLocales = [
-    Locale('en'),
-    Locale('ar'),
-  ];
-
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  final gen.AppLocalizations _l10n;
 
   static AppLocalizations of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+    final l10n = gen.AppLocalizations.of(context);
+    assert(l10n != null, 'AppLocalizations not found in widget tree.');
+    return AppLocalizations._(l10n!);
   }
 
-  Future<void> load() async {
-    final jsonString =
-        await rootBundle.loadString('lib/l10n/app_${locale.languageCode}.arb');
-    final Map<String, dynamic> jsonMap = json.decode(jsonString);
-    _localizedStrings = jsonMap.map(
-      (key, value) => MapEntry(key, value.toString()),
-    );
-  }
-
-  String _lookup(String key) => _localizedStrings[key] ?? key;
-
-  String get appTitle => _lookup('app_title');
-  String get newReport => _lookup('new_report');
-  String get titleLabel => _lookup('title_label');
-  String get descriptionLabel => _lookup('description_label');
-  String get pickFromGallery => _lookup('pick_from_gallery');
-  String get openCamera => _lookup('open_camera');
-  String get removeImage => _lookup('remove_image');
-  String get getLocation => _lookup('get_location');
-  String get saveReport => _lookup('save_report');
-  String get confirmSubmit => _lookup('confirm_submit');
-  String get confirmSubmitMessage => _lookup('confirm_submit_message');
-  String get cancel => _lookup('cancel');
-  String get confirm => _lookup('confirm');
-  String get noReports => _lookup('no_reports');
-  String get noReportsHint => _lookup('no_reports_hint');
-  String get reportSaved => _lookup('report_saved');
-  String get saveFailed => _lookup('save_failed');
-  String get permissionDenied => _lookup('permission_denied');
-  String get locationServicesDisabled => _lookup('location_services_disabled');
-  String get detailsTitle => _lookup('details_title');
-  String get createdAt => _lookup('created_at');
-  String get photoLabel => _lookup('photo_label');
-  String get photoMissing => _lookup('photo_missing');
-  String get locationLabel => _lookup('location_label');
-  String get noLocation => _lookup('no_location');
-  String get photoStatusPresent => _lookup('photo_status_present');
-  String get photoStatusMissing => _lookup('photo_status_missing');
-  String get locationStatusPresent => _lookup('location_status_present');
-  String get locationStatusMissing => _lookup('location_status_missing');
+  String get appTitle => _l10n.appName;
+  String get newReport => _l10n.createReportTitle;
+  String get titleLabel => _l10n.reportTitleLabel;
+  String get descriptionLabel => _l10n.reportDescriptionLabel;
+  String get pickFromGallery => _l10n.pickFromGallery;
+  String get openCamera => _l10n.openCamera;
+  String get removeImage => _l10n.removeImage;
+  String get getLocation => _l10n.getLocation;
+  String get saveReport => _l10n.submit;
+  String get confirmSubmit => _l10n.confirmSubmit;
+  String get confirmSubmitMessage => _l10n.confirmSubmitMessage;
+  String get cancel => _l10n.cancel;
+  String get confirm => _l10n.ok;
+  String get noReports => _l10n.noReports;
+  String get noReportsHint => _l10n.noReportsHint;
+  String get reportSaved => _l10n.savedSuccess;
+  String get saveFailed => _l10n.saveFailed;
+  String get permissionDenied => _l10n.permissionDenied;
+  String get locationServicesDisabled => _l10n.locationServicesDisabled;
+  String get detailsTitle => _l10n.reportDetailsTitle;
+  String get createdAt => _l10n.createdAt;
+  String get photoLabel => _l10n.photoLabel;
+  String get photoMissing => _l10n.photoMissing;
+  String get locationLabel => _l10n.locationLabel;
+  String get noLocation => _l10n.noLocation;
+  String get photoStatusPresent => _l10n.photoStatusPresent;
+  String get photoStatusMissing => _l10n.photoStatusMissing;
+  String get locationStatusPresent => _l10n.locationStatusPresent;
+  String get locationStatusMissing => _l10n.locationStatusMissing;
 
   String locationCaptured({required String lat, required String lng}) {
-    return _lookup('location_captured')
-        .replaceAll('{lat}', lat)
-        .replaceAll('{lng}', lng);
+    return _l10n.locationCaptured(lat, lng);
   }
-}
-
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
-  const _AppLocalizationsDelegate();
-
-  @override
-  bool isSupported(Locale locale) {
-    return AppLocalizations.supportedLocales.any((supportedLocale) =>
-        supportedLocale.languageCode == locale.languageCode);
-  }
-
-  @override
-  Future<AppLocalizations> load(Locale locale) async {
-    final localizations = AppLocalizations(locale);
-    await localizations.load();
-    return localizations;
-  }
-
-  @override
-  bool shouldReload(covariant LocalizationsDelegate<AppLocalizations> old) =>
-      false;
 }

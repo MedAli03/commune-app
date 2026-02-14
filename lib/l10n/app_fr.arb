@@ -1,0 +1,123 @@
+{
+  "@@locale": "fr",
+  "appName": "Signaleur de problèmes municipaux",
+  "homeTitleMunicipality": "Municipalité de Ville-en-Montagne",
+  "homeSubtitle": "Signaler un problème dans votre quartier",
+  "actionReportProblem": "Signaler un problème",
+  "actionAdminLogin": "Connexion Admin",
+  "hintPhotoDescriptionLocation": "Photo, description, localisation",
+  "hintAdminDashboardAccess": "Accès tableau de bord",
+  "tipTitle": "Conseil :",
+  "tipText": "Ajoutez une photo pour accélérer le traitement de votre demande.",
+  "privacyPolicy": "Politique de confidentialité",
+  "serviceFooter": "SERVICE MUNICIPAL • VERSION 2.4.0",
+  "loginTitle": "Connexion Admin",
+  "usernameLabel": "Nom d'utilisateur",
+  "passwordLabel": "Mot de passe",
+  "loginButton": "Connexion",
+  "logoutButton": "Déconnexion",
+  "reportsTitle": "Tableau de bord admin",
+  "filterAll": "Tous",
+  "filterNew": "Nouveau",
+  "filterInProgress": "En cours",
+  "filterResolved": "Résolu",
+  "statusNew": "Nouveau",
+  "statusInProgress": "En cours",
+  "statusResolved": "Résolu",
+  "delete": "Supprimer",
+  "confirmDeleteTitle": "Confirmer la suppression",
+  "confirmDeleteBody": "Voulez-vous vraiment supprimer cet élément ?",
+  "cancel": "Annuler",
+  "ok": "OK",
+  "createReportTitle": "Créer un signalement",
+  "reportTitleLabel": "Titre",
+  "reportDescriptionLabel": "Description",
+  "submit": "Envoyer",
+  "uploading": "Téléversement...",
+  "savedSuccess": "Enregistré avec succès",
+  "errorGeneric": "Une erreur est survenue.",
+  "pickFromGallery": "Choisir depuis la galerie",
+  "openCamera": "Ouvrir l'appareil photo",
+  "removeImage": "Supprimer l'image",
+  "getLocation": "Obtenir ma position",
+  "confirmSubmit": "Confirmer l'envoi",
+  "confirmSubmitMessage": "Voulez-vous envoyer ce signalement ?",
+  "noReports": "Aucun signalement pour le moment",
+  "noReportsHint": "Créez un signalement pour commencer.",
+  "saveFailed": "Impossible d'enregistrer le signalement.",
+  "permissionDenied": "Permission refusée. Veuillez l'activer dans les paramètres.",
+  "locationServicesDisabled": "Les services de localisation sont désactivés.",
+  "reportDetailsTitle": "Détails du signalement",
+  "createdAt": "Créé le",
+  "photoLabel": "Photo",
+  "photoMissing": "Aucune photo disponible",
+  "locationLabel": "Localisation",
+  "noLocation": "Aucune localisation capturée.",
+  "photoStatusPresent": "Photo disponible",
+  "photoStatusMissing": "Pas de photo",
+  "locationStatusPresent": "Localisation disponible",
+  "locationStatusMissing": "Pas de localisation",
+  "locationCaptured": "Lat : {lat}, Lng : {lng}",
+  "@locationCaptured": {
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      },
+      "lng": {
+        "type": "String"
+      }
+    }
+  },
+  "adminLoginRequired": "Connexion admin requise",
+  "searchReports": "Rechercher des signalements",
+  "unableToLoadReports": "Impossible de charger les signalements",
+  "retry": "Réessayer",
+  "markAsNew": "Marquer comme nouveau",
+  "markAsInProgress": "Marquer en cours",
+  "markAsResolved": "Marquer comme résolu",
+  "changeStatus": "Changer le statut",
+  "loadMore": "Charger plus",
+  "statusUpdatedTo": "Statut mis à jour : {status}",
+  "@statusUpdatedTo": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDeleted": "Signalement supprimé",
+  "deleteReport": "Supprimer le signalement",
+  "deleteReportButton": "Supprimer le signalement",
+  "deleteReportConfirmTitle": "Supprimer le signalement",
+  "deleteReportConfirmBody": "Voulez-vous vraiment supprimer \"{title}\" ?",
+  "@deleteReportConfirmBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteImageTitle": "Supprimer l'image",
+  "deleteImageBody": "Retirer cette image du signalement ?",
+  "imageUploaded": "Image téléversée",
+  "imageDeleted": "Image supprimée",
+  "addImage": "Ajouter une image",
+  "deleteImage": "Supprimer l'image",
+  "onlyUploadedImagesCanBeDeleted": "Seules les images téléversées peuvent être supprimées.",
+  "noImages": "Aucune image",
+  "noImagesMessage": "Ajoutez une image pour donner plus de contexte à ce signalement.",
+  "mapPreview": "Aperçu de la carte",
+  "takePhoto": "Prendre une photo",
+  "signInAsAdmin": "Se connecter en tant qu'admin",
+  "usernameRequired": "Le nom d'utilisateur est requis",
+  "passwordRequired": "Le mot de passe est requis",
+  "uploadingProgress": "Téléversement {progress}%",
+  "@uploadingProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "statusLabel": "Statut"
+}

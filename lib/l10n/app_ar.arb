@@ -1,32 +1,123 @@
-﻿{
-  "app_title": "Ø§Ù„Ø¥Ø¨Ù„Ø§Øº Ø¹Ù† Ù…Ø´ÙƒÙ„Ø©",
-  "new_report": "Ø¨Ù„Ø§Øº Ø¬Ø¯ÙŠØ¯",
-  "title_label": "Ø§Ù„Ø¹Ù†ÙˆØ§Ù†",
-  "description_label": "Ø§Ù„ÙˆØµÙ",
-  "pick_from_gallery": "Ø§Ø®ØªÙŠØ§Ø± Ù…Ù† Ø§Ù„Ù…Ø¹Ø±Ø¶",
-  "open_camera": "ÙØªØ­ Ø§Ù„ÙƒØ§Ù…ÙŠØ±Ø§",
-  "remove_image": "Ø¥Ø²Ø§Ù„Ø© Ø§Ù„ØµÙˆØ±Ø©",
-  "get_location": "Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ø§Ù„Ù…ÙˆÙ‚Ø¹",
-  "location_captured": "Ø®Ø· Ø§Ù„Ø¹Ø±Ø¶: {lat}ØŒ Ø®Ø· Ø§Ù„Ø·ÙˆÙ„: {lng}",
-  "save_report": "Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø¨Ù„Ø§Øº",
-  "confirm_submit": "ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„",
-  "confirm_submit_message": "Ù‡Ù„ ØªØ±ÙŠØ¯ Ø­ÙØ¸ Ù‡Ø°Ø§ Ø§Ù„Ø¨Ù„Ø§Øº Ù…Ø­Ù„ÙŠÙ‹Ø§ØŸ",
-  "cancel": "Ø¥Ù„ØºØ§Ø¡",
-  "confirm": "ØªØ£ÙƒÙŠØ¯",
-  "no_reports": "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¨Ù„Ø§ØºØ§Øª Ø¨Ø¹Ø¯",
-  "no_reports_hint": "Ø£Ù†Ø´Ø¦ Ø¨Ù„Ø§ØºÙ‹Ø§ Ø¬Ø¯ÙŠØ¯Ù‹Ø§ Ù„Ù„Ø¨Ø¯Ø¡.",
-  "report_saved": "ØªÙ… Ø­ÙØ¸ Ø§Ù„Ø¨Ù„Ø§Øº",
-  "save_failed": "ØªØ¹Ø°Ø± Ø­ÙØ¸ Ø§Ù„Ø¨Ù„Ø§Øº.",
-  "permission_denied": "ØªÙ… Ø±ÙØ¶ Ø§Ù„Ø¥Ø°Ù†. ÙŠØ±Ø¬Ù‰ ØªÙØ¹ÙŠÙ„Ù‡ Ù…Ù† Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª.",
-  "location_services_disabled": "Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ù…ÙˆÙ‚Ø¹ ØºÙŠØ± Ù…ÙØ¹Ù‘Ù„Ø©.",
-  "details_title": "ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø¨Ù„Ø§Øº",
-  "created_at": "ØªØ§Ø±ÙŠØ® Ø§Ù„Ø¥Ù†Ø´Ø§Ø¡",
-  "photo_label": "Ø§Ù„ØµÙˆØ±Ø©",
-  "photo_missing": "Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙˆØ±Ø© Ù…ØªØ§Ø­Ø©",
-  "location_label": "Ø§Ù„Ù…ÙˆÙ‚Ø¹",
-  "no_location": "Ù„Ù… ÙŠØªÙ… Ø§Ù„ØªÙ‚Ø§Ø· Ø§Ù„Ù…ÙˆÙ‚Ø¹.",
-  "photo_status_present": "Ø§Ù„ØµÙˆØ±Ø© âœ“",
-  "photo_status_missing": "Ù„Ø§ ØªÙˆØ¬Ø¯ ØµÙˆØ±Ø©",
-  "location_status_present": "Ø§Ù„Ù…ÙˆÙ‚Ø¹ âœ“",
-  "location_status_missing": "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…ÙˆÙ‚Ø¹"
+{
+  "@@locale": "ar",
+  "appName": "مُبلّغ مشاكل البلدية",
+  "homeTitleMunicipality": "بلدية فيل أون مونتاني",
+  "homeSubtitle": "أبلغ عن مشكلة في حيّك",
+  "actionReportProblem": "الإبلاغ عن مشكلة",
+  "actionAdminLogin": "دخول الإدارة",
+  "hintPhotoDescriptionLocation": "صورة، وصف، موقع",
+  "hintAdminDashboardAccess": "الوصول إلى لوحة التحكم",
+  "tipTitle": "نصيحة:",
+  "tipText": "أضف صورة لتسريع معالجة طلبك.",
+  "privacyPolicy": "سياسة الخصوصية",
+  "serviceFooter": "الخدمة البلدية • الإصدار 2.4.0",
+  "loginTitle": "تسجيل دخول الإدارة",
+  "usernameLabel": "اسم المستخدم",
+  "passwordLabel": "كلمة المرور",
+  "loginButton": "تسجيل الدخول",
+  "logoutButton": "تسجيل الخروج",
+  "reportsTitle": "لوحة الإدارة",
+  "filterAll": "الكل",
+  "filterNew": "جديد",
+  "filterInProgress": "قيد المعالجة",
+  "filterResolved": "تم الحل",
+  "statusNew": "جديد",
+  "statusInProgress": "قيد المعالجة",
+  "statusResolved": "تم الحل",
+  "delete": "حذف",
+  "confirmDeleteTitle": "تأكيد الحذف",
+  "confirmDeleteBody": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+  "cancel": "إلغاء",
+  "ok": "موافق",
+  "createReportTitle": "إنشاء بلاغ",
+  "reportTitleLabel": "العنوان",
+  "reportDescriptionLabel": "الوصف",
+  "submit": "إرسال",
+  "uploading": "جارٍ الرفع...",
+  "savedSuccess": "تم الحفظ بنجاح",
+  "errorGeneric": "حدث خطأ ما.",
+  "pickFromGallery": "اختيار من المعرض",
+  "openCamera": "فتح الكاميرا",
+  "removeImage": "إزالة الصورة",
+  "getLocation": "الحصول على موقعي",
+  "confirmSubmit": "تأكيد الإرسال",
+  "confirmSubmitMessage": "هل تريد إرسال هذا البلاغ؟",
+  "noReports": "لا توجد بلاغات بعد",
+  "noReportsHint": "أنشئ بلاغًا للبدء.",
+  "saveFailed": "تعذر حفظ البلاغ.",
+  "permissionDenied": "تم رفض الإذن. يرجى تفعيله من الإعدادات.",
+  "locationServicesDisabled": "خدمات الموقع غير مفعلة.",
+  "reportDetailsTitle": "تفاصيل البلاغ",
+  "createdAt": "تاريخ الإنشاء",
+  "photoLabel": "الصورة",
+  "photoMissing": "لا توجد صورة متاحة",
+  "locationLabel": "الموقع",
+  "noLocation": "لم يتم التقاط الموقع.",
+  "photoStatusPresent": "الصورة متوفرة",
+  "photoStatusMissing": "لا توجد صورة",
+  "locationStatusPresent": "الموقع متوفر",
+  "locationStatusMissing": "لا يوجد موقع",
+  "locationCaptured": "خط العرض: {lat}، خط الطول: {lng}",
+  "@locationCaptured": {
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      },
+      "lng": {
+        "type": "String"
+      }
+    }
+  },
+  "adminLoginRequired": "يتطلب تسجيل دخول الإدارة",
+  "searchReports": "بحث في البلاغات",
+  "unableToLoadReports": "تعذر تحميل البلاغات",
+  "retry": "إعادة المحاولة",
+  "markAsNew": "تعيين كجديد",
+  "markAsInProgress": "تعيين كقيد المعالجة",
+  "markAsResolved": "تعيين كمحلول",
+  "changeStatus": "تغيير الحالة",
+  "loadMore": "تحميل المزيد",
+  "statusUpdatedTo": "تم تحديث الحالة إلى {status}",
+  "@statusUpdatedTo": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDeleted": "تم حذف البلاغ",
+  "deleteReport": "حذف البلاغ",
+  "deleteReportButton": "حذف البلاغ",
+  "deleteReportConfirmTitle": "حذف البلاغ",
+  "deleteReportConfirmBody": "هل أنت متأكد أنك تريد حذف \"{title}\"؟",
+  "@deleteReportConfirmBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteImageTitle": "حذف الصورة",
+  "deleteImageBody": "هل تريد إزالة هذه الصورة من البلاغ؟",
+  "imageUploaded": "تم رفع الصورة",
+  "imageDeleted": "تم حذف الصورة",
+  "addImage": "إضافة صورة",
+  "deleteImage": "حذف الصورة",
+  "onlyUploadedImagesCanBeDeleted": "يمكن حذف الصور المرفوعة فقط.",
+  "noImages": "لا توجد صور",
+  "noImagesMessage": "أضف صورة لتوضيح البلاغ بشكل أفضل.",
+  "mapPreview": "معاينة الخريطة",
+  "takePhoto": "التقاط صورة",
+  "signInAsAdmin": "تسجيل الدخول كمسؤول",
+  "usernameRequired": "اسم المستخدم مطلوب",
+  "passwordRequired": "كلمة المرور مطلوبة",
+  "uploadingProgress": "جارٍ الرفع {progress}٪",
+  "@uploadingProgress": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "statusLabel": "الحالة"
 }
