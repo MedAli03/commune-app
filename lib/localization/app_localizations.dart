@@ -22,8 +22,8 @@ class AppLocalizations {
   }
 
   Future<void> load() async {
-    final jsonString = await rootBundle
-        .loadString('lib/l10n/app_${locale.languageCode}.arb');
+    final jsonString =
+        await rootBundle.loadString('lib/l10n/app_${locale.languageCode}.arb');
     final Map<String, dynamic> jsonMap = json.decode(jsonString);
     _localizedStrings = jsonMap.map(
       (key, value) => MapEntry(key, value.toString()),
@@ -34,7 +34,6 @@ class AppLocalizations {
 
   String get appTitle => _lookup('app_title');
   String get newReport => _lookup('new_report');
-  String get myReports => _lookup('my_reports');
   String get titleLabel => _lookup('title_label');
   String get descriptionLabel => _lookup('description_label');
   String get pickFromGallery => _lookup('pick_from_gallery');
@@ -76,8 +75,8 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) {
-    return AppLocalizations.supportedLocales
-        .any((supportedLocale) => supportedLocale.languageCode == locale.languageCode);
+    return AppLocalizations.supportedLocales.any((supportedLocale) =>
+        supportedLocale.languageCode == locale.languageCode);
   }
 
   @override

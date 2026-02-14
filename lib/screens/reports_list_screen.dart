@@ -322,7 +322,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations.myReports),
+        title: const Text('Tableau de bord admin'),
         actions: [
           if (widget.onLogoutRequested != null)
             PopupMenuButton<String>(
