@@ -150,16 +150,22 @@ class _HomeHeader extends StatelessWidget {
             ],
           ),
           padding: const EdgeInsets.all(AppSpacing.sm),
-          child: Image.asset(
-            'assets/images/municipality_logo.png',
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) {
-              return const Icon(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              const Icon(
                 Icons.location_city_rounded,
                 color: AppPalette.accentGreen,
                 size: 36,
-              );
-            },
+              ),
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/images/logomsaken.jpg',
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: AppSpacing.md),
