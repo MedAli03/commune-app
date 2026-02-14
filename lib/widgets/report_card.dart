@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../api/api_config.dart';
 import '../models/report.dart';
 import '../theme/app_theme.dart';
+import '../utils/media_url.dart';
 import '../utils/platform_image.dart';
 
 class ReportCard extends StatelessWidget {
@@ -107,7 +107,9 @@ class _ReportThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final resolvedUrl = _resolvePhotoUrl(photoPath);
+    final resolvedUrl = (photoPath == null || photoPath!.isEmpty)
+        ? null
+        : resolveMediaUrl(photoPath!);
     final imageWidget = _buildImageWidget(resolvedUrl);
 
     return ClipRRect(
@@ -129,7 +131,7 @@ class _ReportThumbnail extends StatelessWidget {
     if (path == null || path.isEmpty) {
       return null;
     }
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    if (isNetworkImageUrl(path)) {
       return Image.network(
         path,
         fit: BoxFit.cover,
@@ -140,16 +142,6 @@ class _ReportThumbnail extends StatelessWidget {
       return buildPlatformImage(path, fit: BoxFit.cover);
     }
     return null;
-  }
-
-  String? _resolvePhotoUrl(String? value) {
-    if (value == null || value.isEmpty) {
-      return null;
-    }
-    if (value.startsWith('/storage/')) {
-      return '$baseUrl$value';
-    }
-    return value;
   }
 }
 

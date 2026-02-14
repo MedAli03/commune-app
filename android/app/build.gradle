@@ -5,24 +5,36 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+def flutterSdkPath = localProperties.getProperty("flutter.sdk")
+def flutterEngineVersion = flutterSdkPath != null
+        ? new File(flutterSdkPath, "bin/internal/engine.version").text.trim()
+        : null
+
 android {
     namespace = "com.example.flutter_application"
-    compileSdk = 34
+    compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
         defaultConfig {
         applicationId "com.example.flutter_application"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 34
+        targetSdkVersion flutter.targetSdkVersion
         versionCode flutter.versionCode
         versionName flutter.versionName
     }
@@ -38,4 +50,12 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Explicit embedding dependency to ensure MainActivity compile classpath.
+    if (flutterEngineVersion != null && !flutterEngineVersion.isEmpty()) {
+        debugImplementation "io.flutter:flutter_embedding_debug:1.0.0-${flutterEngineVersion}"
+        releaseImplementation "io.flutter:flutter_embedding_release:1.0.0-${flutterEngineVersion}"
+    }
 }
